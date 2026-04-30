@@ -40,7 +40,7 @@ Before writing or previewing the static HTML, make an asset inventory for every 
 
 - Record the Figma layer name or id, intended local asset path, export format, and where it appears in the demo.
 - Export or download each listed item as a complete Figma node whenever possible, preferably SVG, into the demo-local `assets/` folder before using it in HTML/CSS.
-- Preserve the exported node's viewBox, intrinsic size, aspect ratio, rendered bounds, inset, and internal transforms. Do not squeeze a 24px source icon into a different hand-chosen geometry such as 20px unless the Figma source itself does so.
+- Preserve the exported node's viewBox, intrinsic size, aspect ratio, rendered bounds, inset, and internal transforms. Do not squeeze, stretch, or reframe any source icon into a different hand-chosen geometry unless the Figma source itself does so.
 - Do not normalize an SVG path to fill its container or rebuild the icon from the path bounding box; Figma component transforms such as inset, scaleX, rotation, masks, and nested groups are part of the source artwork.
 - If whole-node export is unavailable but child vectors are available, only combine them when the original Figma geometry can be preserved exactly, including viewBox, dimensions, rendered bounds, fills, strokes, masks, nested groups, and transforms. Otherwise stop and tell the user which Figma layer is blocked.
 - Do not substitute CSS, emoji, icon fonts, lucide icons, approximate library icons, or manually reassembled child vectors unless the user explicitly accepts a non-1:1 fallback for that specific layer.
