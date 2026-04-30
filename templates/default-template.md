@@ -23,17 +23,10 @@ Use this template for management-ready product demos that show an agent-style wo
 - Present that fixed stage through a browser preview shell that scales it to fit the current viewport without cropping or horizontal scrolling; do not let the raw 1920px-wide stage define the preview page width.
 - Keep preview scaling separate from export sizing so MP4 capture remains exactly 1920x1080 unless the user requests another resolution.
 - Preserve Figma layer positions and real assets.
-- Before coding icon-bearing areas, inventory every navigation icon, toolbar icon, connector mark, chart glyph, and logo-like vector layer; export each visible instance node from Figma into `assets/` as a complete node whenever possible.
-- Track icon provenance in `output/<demo-slug>/icon-provenance.json`: page location, actual Figma instance node id, exported asset path, export format, whole-node status, and fallback reason if any.
-- Track complex-region layer provenance in `output/<demo-slug>/layer-provenance.json` for cards, thumbnails, pills, chips, list rows, media previews, and right-side modules. Include child node ids, bounds, opacity, blend/mask/clipping state, fill/overlay role, z-order, and implementation selector or asset path.
-- Track layout provenance in `output/<demo-slug>/layout-provenance.json` for headings, counters, pills, chips, badges, buttons, composer controls, list rows, and auto-layout groups. Include absolute bounds, parent bounds, padding, gap, item sizing, child bounds, overflow policy, and implementation selector.
-- Export exact icon, logo, and vector-mark layers from Figma as assets, preferably whole-node SVG, and reference them from the demo-local `assets/` folder. Do not substitute similar-looking icon library icons, recreate icons with CSS, or manually reassemble child vectors.
-- Preserve each exported icon's original viewBox, intrinsic size, aspect ratio, rendered bounds, inset, fills, strokes, masks, nested groups, and transforms; do not shrink, stretch, rotate, flip, or path-normalize a Figma icon into another hand-chosen geometry.
-- Do not use a same-named component asset from another Figma instance; instance-specific color, direction, scale, flip, inset, and overrides must come from the actual visible node.
-- Do not use global icon/arrow transforms or shared component fixes that alter all same-named instances. Instance-specific transforms, colors, insets, and orientation must be encoded in the exported asset or an instance-scoped selector tied to provenance.
-- Explicitly implement Figma overlay fills, opacity layers, masks, clipping groups, and blend layers; preserve their stacking order instead of flattening a complex thumbnail or card to only the largest visible image and foreground text.
-- Preserve Figma text frame bounds and auto-layout metadata. Do not let flex grow/shrink, browser text metrics, or content width move adjacent headings, counters, service pills, file chips, badges, or composer controls away from their Figma x/y positions.
-- If any icon-like layer cannot be exported, stop for user direction instead of drawing an approximate placeholder.
+- Follow Static Fidelity Enforcement from `SKILL.md` before visual approval.
+- For this template, the icon provenance inventory must include navigation icons, toolbar icons, connector marks, chart glyphs, arrows, and logo-like vector layers.
+- The layer provenance inventory must include cards, thumbnails, pills, chips, list rows, media previews, and right-side modules.
+- The layout provenance inventory must include headings, counters, pills, chips, badges, buttons, composer controls, list rows, and auto-layout groups.
 - If the design uses a font that is not available locally and cannot be bundled, convert the affected Figma text to vector outlines. If that text must be animated as live text, ask the user whether to provide the font, accept a fallback, or keep the exact outline without typewriter animation.
 - Keep labels, database names, service names, pills, and short menu rows on one line unless the Figma source wraps them.
 - Right-side or downstream modules that are meant to be revealed by the workflow should be hidden in the initial animation state, even if they exist in the static replica for fidelity review.
@@ -78,13 +71,6 @@ Start from the module named by the user. If the flow starts in a composer, type 
 
 - Visual restoration matches the source Figma before animation begins.
 - Static fidelity is proven with provenance artifacts, passing checks, and required focused crops before visual approval is requested.
-- `scripts/check_icon_fidelity.js` passes against the HTML and `icon-provenance.json` before the visual gate.
-- `scripts/check_layer_provenance.js` passes against `layer-provenance.json` before the visual gate, and the file accounts for all overlay, mask, opacity, fill, blend, and z-order layers in complex regions.
-- `scripts/check_layout_provenance.js` passes against `layout-provenance.json` before the visual gate, and spacing-sensitive text, counters, pills, chips, badges, controls, and auto-layout groups preserve Figma bounds, padding, gaps, child bounds, and overflow policy.
-- All icon-like layers come from exported Figma assets, preferably whole-node SVG, rather than CSS approximations or hand-reassembled child vectors.
-- No visible navigation icon, toolbar icon, connector mark, chart glyph, or logo-like vector layer is replaced by a hand-coded CSS shape or approximate library icon.
-- No global selector change for a shared icon/component is accepted until every affected instance has a focused crop review.
-- Directional icons preserve Figma orientation, scale, visual inset, stroke/weight, and rendered bounds; their paths are not simply stretched to fill the target container.
 - Any unavailable special font is bundled or represented by vector outlines.
 - Browser preview shows the whole fixed stage fitted inside the viewport, while export frames remain at the requested resolution.
 - The start module, linked modules, and downstream modules follow the requested cause-and-effect order.

@@ -49,6 +49,7 @@ Before writing or previewing the static HTML, make an asset inventory for every 
 - Do not substitute CSS, emoji, icon fonts, lucide icons, approximate library icons, or manually reassembled child vectors unless the user explicitly accepts a non-1:1 fallback for that specific layer.
 - Use CSS only for layout, masks, sizing, opacity, and animation of exported assets; do not draw the source icon shape with borders, pseudo-elements, gradients, or hand-coded SVG.
 - Save the provenance table as `output/<demo-slug>/icon-provenance.json` before the visual fidelity gate. Missing provenance blocks the gate.
+- If the target node has no icon-like or vector rows, write a single row with `notApplicableReason` instead of inventing empty placeholder entries.
 - Run `node scripts/check_icon_fidelity.js --html output/<demo-slug>/<demo-slug>.html --provenance output/<demo-slug>/icon-provenance.json` before visual review. The check must fail on inline SVG, CSS pseudo-element drawing, text/emoji/icon-font substitutions, lucide or other icon-library usage, missing exported asset paths, missing actual Figma node ids, non-whole-node exports without an explicit Figma-node fallback reason, or any manual-rebuild flag.
 - During visual review, compare icon identity as part of fidelity, not just position and size. Review icon crops or focused screenshots for dense icon areas such as navigation rails, arrows, service/database marks, composer controls, and right-side cards.
 
@@ -59,6 +60,7 @@ Before the static visual gate, preserve instance context and child-layer structu
 - Treat every visible Figma instance as context-specific. Do not use a global selector or shared CSS transform to fix all same-named icons, arrows, chips, controls, or cards. Shared CSS may set neutral layout primitives, but instance-specific color, direction, scale, flip, inset, opacity, transform, and bounds must come from the actual Figma node export or an instance-scoped selector tied to provenance.
 - For complex regions such as cards, thumbnails, pills, chips, list rows, media previews, and right-side modules, create a child-layer inventory before coding. Include Figma node id, layer name, type, bounds, opacity, blend mode, mask/clipping state, fill/overlay role, z-order, and implementation selector or asset path.
 - Save that inventory as `output/<demo-slug>/layer-provenance.json`. Missing entries for visible overlay, mask, opacity, fill, or blend layers block the visual gate.
+- If the target node has no complex regions, write a single row with `notApplicableReason` instead of inventing empty placeholder entries.
 - Run `node scripts/check_layer_provenance.js --provenance output/<demo-slug>/layer-provenance.json` before visual review. The check must fail on missing child-layer rows, missing bounds or z-order, unimplemented layers, or sensitive opacity/mask/blend/fill layers without an implementation selector or asset path.
 - Implement transparent overlays, masks, blend layers, clipping groups, and fill rectangles explicitly. Do not assume they are part of the underlying image unless the exported Figma node already includes them.
 - Preserve stacking order inside complex regions: background/image, overlay or mask layers, foreground pills/cards, text, and icons must follow the Figma layer tree.
@@ -73,6 +75,7 @@ Before the static visual gate, preserve Figma layout metadata for text-bearing a
 - Browser font metrics may be wider or narrower than Figma. Keep the Figma text frame's position and width fixed; use the source font, outlined text, `overflow: hidden`, clipping, or ellipsis according to the Figma design rather than letting text push neighboring elements.
 - For pills, chips, badges, and buttons, preserve total component width, left/right padding, icon/text child bounds, and gaps from Figma metadata. Do not let flex content naturally squeeze, expand, or re-center children unless the Figma node uses that sizing behavior.
 - Run `node scripts/check_layout_provenance.js --provenance output/<demo-slug>/layout-provenance.json` before visual review. The check must fail on missing bounds, missing implementation selectors, text-like rows without locked text bounds, auto-layout rows without padding/gap/item sizing, or component rows without overflow policy.
+- If the target node has no text-bearing or auto-layout regions, write a single row with `notApplicableReason` instead of inventing empty placeholder entries.
 - Inspect focused crops for text-bearing headers, counters, pills, chips, and controls; full-page screenshots are not enough to approve spacing-sensitive typography.
 
 ## Static Fidelity Enforcement

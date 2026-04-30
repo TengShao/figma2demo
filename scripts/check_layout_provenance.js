@@ -1,25 +1,14 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-
-function parseArgs(argv) {
-  const args = {};
-  for (let i = 2; i < argv.length; i += 1) {
-    const key = argv[i];
-    const next = argv[i + 1];
-    if (key === "--provenance") {
-      if (!next || next.startsWith("--")) throw new Error(`Missing value for ${key}`);
-      args.provenance = next;
-      i += 1;
-    } else if (key === "--help") {
-      args.help = true;
-    } else {
-      throw new Error(`Unknown argument: ${key}`);
-    }
-  }
-  return args;
-}
+const {
+  path,
+  parseArgs,
+  loadJsonArray,
+  hasBounds,
+  isNotApplicable,
+  validateRequired,
+  report,
+} = require("./check_utils");
 
 function usage() {
   return [
@@ -30,21 +19,8 @@ function usage() {
     "  pageLocation, figmaNodeId, role, bounds, implementationSelector, overflowPolicy",
     "Text rows also need textBoundsLocked=true.",
     "Auto-layout/component rows also need padding, gap, itemSizing, and childBounds.",
+    "If the page has no text-bearing or auto-layout regions, use [{\"notApplicableReason\":\"...\"}].",
   ].join("\n");
-}
-
-function loadRows(file) {
-  const data = JSON.parse(fs.readFileSync(file, "utf8"));
-  if (!Array.isArray(data)) throw new Error("Layout provenance JSON must be an array");
-  return data;
-}
-
-function hasBounds(bounds) {
-  return bounds
-    && Number.isFinite(bounds.x)
-    && Number.isFinite(bounds.y)
-    && Number.isFinite(bounds.width)
-    && Number.isFinite(bounds.height);
 }
 
 function hasPadding(padding) {
@@ -67,16 +43,14 @@ function validate(rows) {
   const textRoles = new Set(["text", "heading", "label", "counter", "count", "caption"]);
   const componentRoles = new Set(["pill", "chip", "badge", "button", "control", "composer-control", "list-row", "auto-layout"]);
 
+  if (isNotApplicable(rows)) return issues;
+
   if (rows.length === 0) {
     issues.push("layout provenance: expected rows for text-bearing and auto-layout regions");
   }
 
   rows.forEach((row, index) => {
-    for (const key of required) {
-      if (!(key in row) || row[key] === "" || row[key] === null) {
-        issues.push(`layout[${index}]: missing ${key}`);
-      }
-    }
+    validateRequired(row, required, "layout", index, issues);
 
     if (!hasBounds(row.bounds)) {
       issues.push(`layout[${index}]: bounds must include finite x, y, width, and height`);
@@ -115,21 +89,14 @@ function validate(rows) {
 }
 
 function main() {
-  const args = parseArgs(process.argv);
+  const args = parseArgs(process.argv, ["--provenance"]);
   if (args.help) {
     console.log(usage());
     return;
   }
   if (!args.provenance) throw new Error(`${usage()}\n\nMissing --provenance`);
 
-  const issues = validate(loadRows(path.resolve(args.provenance)));
-  if (issues.length > 0) {
-    console.error("Layout provenance check failed:");
-    for (const issue of issues) console.error(`- ${issue}`);
-    process.exit(1);
-  }
-
-  console.log("Layout provenance check passed.");
+  report("Layout provenance", validate(loadJsonArray(path.resolve(args.provenance), "Layout provenance")));
 }
 
 try {

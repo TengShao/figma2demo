@@ -1,27 +1,15 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-
-function parseArgs(argv) {
-  const args = {};
-  for (let i = 2; i < argv.length; i += 1) {
-    const key = argv[i];
-    const next = argv[i + 1];
-    if (key === "--html" || key === "--provenance") {
-      if (!next || next.startsWith("--")) {
-        throw new Error(`Missing value for ${key}`);
-      }
-      args[key.slice(2)] = next;
-      i += 1;
-    } else if (key === "--help") {
-      args.help = true;
-    } else {
-      throw new Error(`Unknown argument: ${key}`);
-    }
-  }
-  return args;
-}
+const {
+  fs,
+  path,
+  parseArgs,
+  readText,
+  loadJsonArray,
+  isNotApplicable,
+  validateRequired,
+  report,
+} = require("./check_utils");
 
 function usage() {
   return [
@@ -31,11 +19,8 @@ function usage() {
     "Provenance JSON must be an array of rows with:",
     "  pageLocation, figmaNodeId, assetPath, exportFormat, wholeNodeExport, manualRebuild, implementationSelector",
     "Fallback rows also need fallbackReason.",
+    "If the page has no icon/vector rows, use [{\"notApplicableReason\":\"...\"}].",
   ].join("\n");
-}
-
-function readText(file) {
-  return fs.readFileSync(file, "utf8");
 }
 
 function collectLinkedCss(html, htmlFile) {
@@ -62,7 +47,7 @@ function scanForbidden(text, sourceName) {
     ["CSS content drawing", /\bcontent\s*:\s*["'][^"']+["']/i],
     ["icon library usage", /\b(?:lucide|heroicons?|font-?awesome|material-icons?|data-lucide)\b/i],
     ["icon font element", /<i\b[^>]*class=["'][^"']*(?:icon|fa-|material-icons?)[^"']*["']/i],
-    ["text arrow/operator icon", /[›‹→←➜➔➝⌘＋+]/u],
+    ["text arrow/operator icon", /[›‹→←➜➔➝⌘＋]/u],
     ["border-drawn icon class", /\.(?:[\w-]*icon[\w-]*|[\w-]*arrow[\w-]*|[\w-]*chevron[\w-]*)[^{]*\{[^}]*\bborder(?:-(?:top|right|bottom|left))?\s*:/i],
     ["global icon/arrow transform", /(?:^|})\s*(?:\.[^{},]*(?:icon|arrow|chevron)[^{},]*|img[^{},]*(?:icon|arrow|chevron)[^{},]*)\s*\{[^}]*\btransform\s*:/i],
   ];
@@ -76,26 +61,16 @@ function scanForbidden(text, sourceName) {
   return issues;
 }
 
-function loadProvenance(file) {
-  const data = JSON.parse(readText(file));
-  if (!Array.isArray(data)) {
-    throw new Error("Provenance JSON must be an array");
-  }
-  return data;
-}
-
 function validateProvenance(rows, provenanceFile) {
   const issues = [];
   const baseDir = path.dirname(provenanceFile);
   const required = ["pageLocation", "figmaNodeId", "assetPath", "exportFormat", "wholeNodeExport", "manualRebuild", "implementationSelector"];
   const assetOwners = new Map();
 
+  if (isNotApplicable(rows)) return issues;
+
   rows.forEach((row, index) => {
-    for (const key of required) {
-      if (!(key in row) || row[key] === "" || row[key] === null) {
-        issues.push(`provenance[${index}]: missing ${key}`);
-      }
-    }
+    validateRequired(row, required, "provenance", index, issues);
 
     if (row.manualRebuild === true) {
       issues.push(`provenance[${index}]: manualRebuild must be false`);
@@ -133,7 +108,7 @@ function validateProvenance(rows, provenanceFile) {
 }
 
 function main() {
-  const args = parseArgs(process.argv);
+  const args = parseArgs(process.argv, ["--html", "--provenance"]);
   if (args.help) {
     console.log(usage());
     return;
@@ -152,15 +127,8 @@ function main() {
   for (const cssFile of cssFiles) {
     issues.push(...scanForbidden(readText(cssFile), cssFile));
   }
-  issues.push(...validateProvenance(loadProvenance(provenanceFile), provenanceFile));
-
-  if (issues.length > 0) {
-    console.error("Icon fidelity check failed:");
-    for (const issue of issues) console.error(`- ${issue}`);
-    process.exit(1);
-  }
-
-  console.log("Icon fidelity check passed.");
+  issues.push(...validateProvenance(loadJsonArray(provenanceFile, "Provenance"), provenanceFile));
+  report("Icon fidelity", issues);
 }
 
 try {

@@ -1,25 +1,14 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-
-function parseArgs(argv) {
-  const args = {};
-  for (let i = 2; i < argv.length; i += 1) {
-    const key = argv[i];
-    const next = argv[i + 1];
-    if (key === "--provenance") {
-      if (!next || next.startsWith("--")) throw new Error(`Missing value for ${key}`);
-      args.provenance = next;
-      i += 1;
-    } else if (key === "--help") {
-      args.help = true;
-    } else {
-      throw new Error(`Unknown argument: ${key}`);
-    }
-  }
-  return args;
-}
+const {
+  path,
+  parseArgs,
+  loadJsonArray,
+  hasBounds,
+  isNotApplicable,
+  validateRequired,
+  report,
+} = require("./check_utils");
 
 function usage() {
   return [
@@ -28,21 +17,8 @@ function usage() {
     "",
     "Provenance JSON must be an array of child-layer rows with:",
     "  region, figmaNodeId, layerName, layerType, bounds, zOrder, role, implemented, implementationSelector",
+    "If the page has no complex regions, use [{\"notApplicableReason\":\"...\"}].",
   ].join("\n");
-}
-
-function loadRows(file) {
-  const data = JSON.parse(fs.readFileSync(file, "utf8"));
-  if (!Array.isArray(data)) throw new Error("Layer provenance JSON must be an array");
-  return data;
-}
-
-function hasBounds(bounds) {
-  return bounds
-    && Number.isFinite(bounds.x)
-    && Number.isFinite(bounds.y)
-    && Number.isFinite(bounds.width)
-    && Number.isFinite(bounds.height);
 }
 
 function validate(rows) {
@@ -50,16 +26,14 @@ function validate(rows) {
   const required = ["region", "figmaNodeId", "layerName", "layerType", "bounds", "zOrder", "role", "implemented", "implementationSelector"];
   const sensitiveRoles = new Set(["overlay", "mask", "clip", "opacity", "blend", "fill"]);
 
+  if (isNotApplicable(rows)) return issues;
+
   if (rows.length === 0) {
     issues.push("layer provenance: expected child-layer rows for complex regions");
   }
 
   rows.forEach((row, index) => {
-    for (const key of required) {
-      if (!(key in row) || row[key] === "" || row[key] === null) {
-        issues.push(`layer[${index}]: missing ${key}`);
-      }
-    }
+    validateRequired(row, required, "layer", index, issues);
 
     if (!hasBounds(row.bounds)) {
       issues.push(`layer[${index}]: bounds must include finite x, y, width, and height`);
@@ -92,22 +66,14 @@ function validate(rows) {
 }
 
 function main() {
-  const args = parseArgs(process.argv);
+  const args = parseArgs(process.argv, ["--provenance"]);
   if (args.help) {
     console.log(usage());
     return;
   }
   if (!args.provenance) throw new Error(`${usage()}\n\nMissing --provenance`);
 
-  const rows = loadRows(path.resolve(args.provenance));
-  const issues = validate(rows);
-  if (issues.length > 0) {
-    console.error("Layer provenance check failed:");
-    for (const issue of issues) console.error(`- ${issue}`);
-    process.exit(1);
-  }
-
-  console.log("Layer provenance check passed.");
+  report("Layer provenance", validate(loadJsonArray(path.resolve(args.provenance), "Layer provenance")));
 }
 
 try {
