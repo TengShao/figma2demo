@@ -95,15 +95,15 @@ Before the visual fidelity gate, the static HTML must prove 1:1 restoration with
 
 If the user asks to add, modify, improve, rename, remove, or review a template, effect pack, or parameter, enter **Library maintenance mode** instead of demo production mode.
 
-For demo production mode, run the Figma MCP dependency check and collect these required inputs before implementation:
+For demo production mode, run the Figma MCP dependency check and collect only these required inputs before static implementation:
 
 1. Figma design URL.
 2. `demoName`: the user-facing demo name.
 3. Main template id.
-4. Which module starts the animation.
-5. Which modules must appear or react together.
 
 If the user has not specified duration, resolution, or output format, use template defaults when present, otherwise assume 10-15 seconds, 1920x1080, 24 fps, MP4.
+
+Do not ask which module starts the animation or which modules should appear together before visual fidelity is approved. If the user volunteers those animation details early, keep them as notes, but do not block static restoration on them.
 
 ## Template And Effect Selection
 
@@ -172,7 +172,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Confirm that text-bearing and auto-layout regions passed the Bounds And Text Layout Gate, including fixed text frames, padding, gaps, overflow, and child bounds.
    - Ask the user to confirm whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
-   - Do not start animation work until the user confirms the visual restoration.
+   - Do not ask animation-start or linked-module questions, infer animation flow, or start animation work until the user confirms the visual restoration.
 
 2. **Animation gate**
    - After the user confirms the visual stage, implement the template-driven animation timeline and selected effect packs.
@@ -223,6 +223,9 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 
 4. **Define the animation timeline**
    - Follow the selected template and loaded parameters.
+   - First read the approved static HTML structure, provenance files, visible text, CSS selectors/classes, and Figma layer names to infer likely cause-and-effect relationships among modules.
+   - Present recommended animation start points and linked-module groups based on the static screen before asking the user to decide. Explain the evidence briefly, such as composer prominence, upload chips near file cards, matching database/service labels, arrows, shared headings, or right-side result cards.
+   - Ask which module starts the animation and which modules must appear or react together only after giving those recommendations.
    - Apply selected effect packs only where they fit the user's requested module flow and the Figma design.
    - Make a small timing table before heavy animation work:
      - `time`: when the event starts
@@ -230,7 +233,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
      - `motion`: typewriter, fade, slide, panel move, cursor click, etc.
      - `linked_to`: any module that must appear in sync
      - `pause_after`: intentional hold before the next event
-   - Start from the module named by the user.
+   - Start from the module chosen or confirmed by the user after visual approval.
    - Use named CSS classes or CSS variables for timing, so user feedback can be patched precisely.
 
 5. **Preview and confirm animation before video export**

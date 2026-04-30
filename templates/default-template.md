@@ -12,10 +12,10 @@ Use this template for management-ready product demos that show an agent-style wo
 
 - Figma design URL.
 - `demoName`.
-- The module that starts the animation.
-- The modules that must appear together.
 - The user prompt or task text, if the screen includes a composer.
 - Which files, knowledge sections, service modules, or analysis panels are simulated rather than already visible.
+
+Collect the animation start module and linked modules only after the static visual restoration is approved. Before asking, infer a recommended flow from the approved HTML structure, provenance files, Figma layer names, and visible relationships among composer, file chips, databases, services, and result cards.
 
 ## Visual Restoration Rules
 
@@ -33,7 +33,7 @@ Use this template for management-ready product demos that show an agent-style wo
 
 ## Animation Scheme
 
-Start from the module named by the user. If the flow starts in a composer, type or reveal the prompt, perform the send action, then begin downstream module motion.
+After visual approval, recommend an animation start module and linked-module groups before asking the user to confirm. If the flow starts in a composer, type or reveal the prompt, perform the send action, then begin downstream module motion.
 
 | phase | module | motion | linked modules | pause after |
 | --- | --- | --- | --- | --- |

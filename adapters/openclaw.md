@@ -33,11 +33,12 @@ Create a reviewed animated HTML/MP4 demo from a Figma design.
 
 Expected behavior:
 
-- ask for `demoName`, template id, animation start module, linked modules, and optional effects
+- ask for `demoName`, template id, and optional effects
 - verify Figma MCP access before implementation
 - load the selected template, selected effects, and template parameters
 - rebuild a 1:1 static HTML stage
 - ask for visual approval
+- after visual approval, infer likely animation start and linked modules from the approved HTML/Figma structure, recommend them, and ask the user to confirm
 - implement animation
 - ask for animation approval
 - perform the post-animation template persistence check

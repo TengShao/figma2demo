@@ -42,11 +42,12 @@ Before implementation:
 
 Flow:
 
-1. Ask for Figma URL, demoName, template id, animation start module, linked modules, and optional effects.
+1. Ask for Figma URL, demoName, template id, and optional effects.
 2. Build a 1:1 static HTML stage and ask for visual approval.
-3. Implement animation and ask for animation approval.
-4. Before MP4 export, ask whether reusable special requirements should update the current template or become a new template.
-5. Export using references/export.md.
+3. After visual approval, inspect the approved HTML/Figma structure, recommend animation start and linked modules, then ask the user to confirm.
+4. Implement animation and ask for animation approval.
+5. Before MP4 export, ask whether reusable special requirements should update the current template or become a new template.
+6. Export using references/export.md.
 ```
 
 ## Recommended Prompts
@@ -55,7 +56,6 @@ Flow:
 Use Figma2Demo to create a demo from this Figma link.
 Template: default-template.
 Demo name: <name>.
-Start from <module>.
 Use <effect ids> effects.
 ```
 

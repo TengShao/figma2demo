@@ -21,9 +21,8 @@ Then create a demo with:
 ```text
 Use $figma2demo to create a demo named "Agent Workflow Review" from this Figma link.
 Template: default-template.
-Start from the composer.
-Link uploaded files, knowledge search, service results, and final analysis.
 Use typewriter and cursor-send effects.
+After visual approval, recommend the animation start point and linked modules before asking me to confirm.
 ```
 
 ### Agent Adapters
@@ -99,9 +98,8 @@ Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agen
 ```text
 使用 $figma2demo 基于这个 Figma 链接创建一个名为“Agent Workflow Review”的演示。
 模板：default-template。
-从输入框开始动画。
-上传文件、知识检索、服务结果和最终分析需要联动出现。
 使用 typewriter 和 cursor-send 特效包。
+视觉确认后，先建议动画起点和联动模块，再让我确认。
 ```
 
 ### Agent 适配
