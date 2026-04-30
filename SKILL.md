@@ -29,7 +29,7 @@ Library maintenance mode does not require Figma MCP unless the user asks to vali
 ## Non-Negotiable Fidelity Rules
 
 - Restore the Figma design 1:1. Layer position, size, typography, colors, borders, radii, shadows, opacity, blur, images, masks, and interaction states are all source-of-truth details.
-- Icons and logo-like vector marks must be exported from Figma as real vector assets, preferably SVG, and referenced from the demo-local `assets/` folder. Do not recreate icons with CSS boxes, pseudo-elements, emoji, icon fonts, or approximate icon libraries.
+- Icons and logo-like vector marks must be exported from Figma as real vector assets, preferably whole-node SVG, and referenced from the demo-local `assets/` folder. Do not recreate icons with CSS boxes, pseudo-elements, emoji, icon fonts, approximate icon libraries, or manually reassembled child vectors.
 - If a design uses a special font that is not available locally and cannot be bundled for the demo, convert the affected text to vector outlines from Figma and use those outlines for visual fidelity.
 - If outlined text would conflict with requested editable or typewriter text, stop and ask the user whether to provide the font file, accept a fallback font, or keep the exact outline without text animation.
 - Do not simplify detailed Figma artwork into CSS approximations unless the user explicitly approves that tradeoff.
@@ -39,8 +39,10 @@ Library maintenance mode does not require Figma MCP unless the user asks to vali
 Before writing or previewing the static HTML, make an asset inventory for every icon-like layer, logo, vector mark, chart glyph, and custom illustration visible in the target Figma node:
 
 - Record the Figma layer name or id, intended local asset path, export format, and where it appears in the demo.
-- Export or download each listed item from Figma into the demo-local `assets/` folder before using it in HTML/CSS.
-- If any listed item cannot be exported, stop and tell the user which Figma layer is blocked. Do not substitute CSS, emoji, icon fonts, lucide icons, or approximate library icons unless the user explicitly accepts a non-1:1 fallback for that specific layer.
+- Export or download each listed item as a complete Figma node whenever possible, preferably SVG, into the demo-local `assets/` folder before using it in HTML/CSS.
+- Preserve the exported node's viewBox, intrinsic size, aspect ratio, and internal transforms. Do not squeeze a 24px source icon into a different hand-chosen geometry such as 20px unless the Figma source itself does so.
+- If whole-node export is unavailable but child vectors are available, only combine them when the original Figma geometry can be preserved exactly, including viewBox, dimensions, fills, strokes, masks, and transforms. Otherwise stop and tell the user which Figma layer is blocked.
+- Do not substitute CSS, emoji, icon fonts, lucide icons, approximate library icons, or manually reassembled child vectors unless the user explicitly accepts a non-1:1 fallback for that specific layer.
 - Use CSS only for layout, masks, sizing, opacity, and animation of exported assets; do not draw the source icon shape with borders, pseudo-elements, gradients, or hand-coded SVG.
 - During visual review, compare icon identity as part of fidelity, not just position and size.
 

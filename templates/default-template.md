@@ -23,8 +23,9 @@ Use this template for management-ready product demos that show an agent-style wo
 - Present that fixed stage through a browser preview shell that scales it to fit the current viewport without cropping or horizontal scrolling; do not let the raw 1920px-wide stage define the preview page width.
 - Keep preview scaling separate from export sizing so MP4 capture remains exactly 1920x1080 unless the user requests another resolution.
 - Preserve Figma layer positions and real assets.
-- Before coding icon-bearing areas, inventory every navigation icon, toolbar icon, connector mark, chart glyph, and logo-like vector layer; export each one from Figma into `assets/`.
-- Export exact icon, logo, and vector-mark layers from Figma as assets, preferably SVG, and reference them from the demo-local `assets/` folder. Do not substitute similar-looking icon library icons or recreate icons with CSS.
+- Before coding icon-bearing areas, inventory every navigation icon, toolbar icon, connector mark, chart glyph, and logo-like vector layer; export each one from Figma into `assets/` as a complete node whenever possible.
+- Export exact icon, logo, and vector-mark layers from Figma as assets, preferably whole-node SVG, and reference them from the demo-local `assets/` folder. Do not substitute similar-looking icon library icons, recreate icons with CSS, or manually reassemble child vectors.
+- Preserve each exported icon's original viewBox, intrinsic size, aspect ratio, fills, strokes, masks, and transforms; do not shrink or stretch a 24px Figma icon into another hand-chosen geometry.
 - If any icon-like layer cannot be exported, stop for user direction instead of drawing an approximate placeholder.
 - If the design uses a font that is not available locally and cannot be bundled, convert the affected Figma text to vector outlines. If that text must be animated as live text, ask the user whether to provide the font, accept a fallback, or keep the exact outline without typewriter animation.
 - Keep labels, database names, service names, pills, and short menu rows on one line unless the Figma source wraps them.
@@ -69,7 +70,7 @@ Start from the module named by the user. If the flow starts in a composer, type 
 ## Acceptance Checks
 
 - Visual restoration matches the source Figma before animation begins.
-- All icon-like layers come from exported Figma assets rather than CSS approximations.
+- All icon-like layers come from exported Figma assets, preferably whole-node SVG, rather than CSS approximations or hand-reassembled child vectors.
 - No visible navigation icon, toolbar icon, connector mark, chart glyph, or logo-like vector layer is replaced by a hand-coded CSS shape or approximate library icon.
 - Any unavailable special font is bundled or represented by vector outlines.
 - Browser preview shows the whole fixed stage fitted inside the viewport, while export frames remain at the requested resolution.
