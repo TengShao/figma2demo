@@ -1,4 +1,4 @@
-# Template: agent-workspace
+# Template: default-template
 
 Use this template for management-ready product demos that show an agent-style workspace receiving a user request, attaching context files, consulting knowledge or services, and revealing analysis modules in a staged sequence.
 

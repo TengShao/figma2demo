@@ -51,7 +51,7 @@ Flow:
 
 ```text
 Use Figma2Demo to create a demo from this Figma link.
-Template: agent-workspace.
+Template: default-template.
 Demo name: <name>.
 Start from <module>.
 Use <effect ids> effects.

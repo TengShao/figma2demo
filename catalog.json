@@ -1,9 +1,9 @@
 {
   "templates": [
     {
-      "id": "agent-workspace",
-      "title": "Agent Workspace Demo",
-      "file": "templates/agent-workspace.md",
+      "id": "default-template",
+      "title": "Default Template",
+      "file": "templates/default-template.md",
       "summary": "A reviewed product-operation demo pattern for agent workspaces with staged upload, search, service, and analysis modules.",
       "tags": ["agent", "workspace", "management-demo"],
       "parameters": ["agentic-workflow-rhythm"],
