@@ -1,17 +1,18 @@
 ---
 name: figma2demo
-description: Convert Figma designs into faithful reviewed HTML demos and MP4 videos using user-selected templates, optional effect packs, reusable parameters, staged animation review, and deterministic frame export.
+description: Convert Figma designs into faithful reviewed HTML demos, MP4 videos, and optional frontend starter projects using user-selected templates, optional effect packs, reusable parameters, staged animation review, and deterministic frame export.
 ---
 
 # Figma2Demo
 
-Use this skill to turn a Figma design into a faithful animated HTML demo and export it as an MP4. The core workflow is generic: read Figma first, rebuild the screen in HTML, confirm visual fidelity, apply the selected template and optional effect packs, confirm animation, then export video.
+Use this skill to turn a Figma design into a faithful animated HTML demo, export it as an MP4, and optionally convert the approved HTML into a frontend starter project. The core workflow is generic: read Figma first, rebuild the screen in HTML, confirm visual fidelity, optionally export frontend code, apply the selected template and optional effect packs, confirm animation, then export video.
 
 Templates define repeatable demo schemes for a family of designs. Effect packs are ordinary-user options for reusable animation treatments. Parameters are template-maintenance files for special logic, rhythm, or export rules; do not surface parameters in the ordinary run flow unless the user asks to maintain templates.
 
-This skill has two modes:
+This skill has three modes:
 
 - **Demo production mode**: create an HTML/MP4 demo from a Figma design.
+- **Frontend Mode**: after visual fidelity approval, convert the approved HTML restoration into a standalone React/Vite/TypeScript frontend starter project.
 - **Library maintenance mode**: add, modify, or remove reusable templates, effect packs, or parameters.
 
 ## Dependency Check
@@ -25,6 +26,8 @@ Demo production mode requires a working Figma MCP connection. Do this check befo
 5. Do not proceed from screenshots or manual visual guesses unless the user explicitly asks to bypass the Figma MCP dependency and accepts that the result is no longer guaranteed 1:1.
 
 Library maintenance mode does not require Figma MCP unless the user asks to validate a template, effect, or parameter against a live Figma design.
+
+Frontend Mode does not require a new Figma read if it starts from an already approved HTML restoration and its provenance artifacts. If the user asks for frontend code directly from Figma without an approved HTML restoration, complete the visual restoration flow first unless the user explicitly accepts a lower-fidelity shortcut.
 
 ## Non-Negotiable Fidelity Rules
 
@@ -123,6 +126,16 @@ Use `touchedAreas` and `conflictsWith` from `catalog.json` to detect conflicts a
 
 When the user asks to add, modify, improve, rename, remove, or review reusable templates, effect packs, or parameters, read `references/maintenance.md` and follow its guided flow. Make maintenance feel guided, not file-centric.
 
+## Frontend Mode
+
+Frontend Mode is an optional branch, not a template. It can be offered for any template after visual fidelity is approved.
+
+- After the user confirms the static visual restoration, offer Frontend Mode as an option alongside continuing to animation and MP4 export.
+- If the user continues with animation and MP4 first, offer Frontend Mode again after the MP4 is successfully exported.
+- Do not generate frontend code unless the user explicitly selects Frontend Mode or asks for frontend export.
+- When Frontend Mode is selected, read `references/frontend-mode.md` and follow its output contract, conversion rules, data extraction rules, asset rules, animation policy, and validation checklist.
+- Keep Frontend Mode output separate from demo and MP4 artifacts under `output/<demo-slug>/frontend/`.
+
 ## Naming And Output Paths
 
 Use the original `demoName` as the readable HTML title and demo label. Also derive a filesystem-safe slug from it:
@@ -138,6 +151,7 @@ Use the slug to isolate generated artifacts:
 output/<demo-slug>/
   <demo-slug>.html
   <demo-slug>.mp4
+  frontend/
   icon-provenance.json
   layer-provenance.json
   layout-provenance.json
@@ -174,6 +188,8 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Ask the user to confirm whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
    - Do not ask animation-start or linked-module questions, infer animation flow, or start animation work until the user confirms the visual restoration.
+   - After explicit visual approval, offer Frontend Mode as an optional branch: continue animation/MP4, export a frontend starter project, or do both.
+   - Stop and wait for explicit user confirmation before continuing to animation or generating frontend code.
 
 2. **Animation gate**
    - After the user confirms the visual stage, implement the template-driven animation timeline and selected effect packs.
@@ -187,6 +203,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - If reusable requirements exist, ask whether the user wants to update the current template, create a new template, or keep the requirements only for this demo. If they choose to persist changes, read `references/maintenance.md`.
    - Only after this persistence check is resolved, capture and encode the final MP4.
    - Verify video metadata and report the output path.
+   - After successful MP4 export, offer Frontend Mode again if it has not already been generated for this demo.
 
 ## Workflow
 
@@ -220,7 +237,9 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - After changes to any shared selector, shared asset, or reused component, inspect focused crops for every affected instance before re-requesting approval.
    - Invite visual diff comments only at this gate: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
-   - Stop and wait for explicit user confirmation before continuing to animation.
+   - After visual approval, offer the next branch: continue animation/MP4, export a Frontend Mode project, or do both.
+   - If the user selects Frontend Mode, read `references/frontend-mode.md` and generate the standalone frontend project from the approved HTML and provenance artifacts.
+   - Stop and wait for explicit user confirmation before continuing to animation or frontend export.
 
 4. **Define the animation timeline**
    - Follow the selected template and loaded parameters.
@@ -255,6 +274,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Encode MP4/H.264 with AVFoundation/Swift by default on macOS.
    - If Swift/AVFoundation fails, or the environment is not macOS, fall back to ffmpeg with H.264 (`libx264`, then `h264_videotoolbox` on macOS if available).
    - Verify the final file's width, height, duration, and playable container metadata.
+   - After successful export, ask whether the user wants to generate a Frontend Mode project from the approved HTML if it has not already been generated.
 
 ## Manual Library Editing
 

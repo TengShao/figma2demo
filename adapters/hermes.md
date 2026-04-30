@@ -10,6 +10,7 @@ Load the minimum files needed for the requested task:
 
 - Always: `SKILL.md`, `catalog.json`
 - Demo production: selected template, selected effects, template parameters, `references/export.md`
+- Frontend Mode: `references/frontend-mode.md`
 - Library maintenance: `references/maintenance.md` and the relevant template/effect/parameter files
 
 ## Required Capabilities
@@ -22,7 +23,7 @@ Load the minimum files needed for the requested task:
 ## Prompt Template
 
 ```text
-Use the Figma2Demo workflow.
+/figma2demo with this Figma link.
 
 Read:
 - SKILL.md
@@ -31,6 +32,7 @@ Read:
 - selected effects, if any
 - template parameters
 - references/export.md when exporting
+- references/frontend-mode.md when exporting a frontend starter
 - references/maintenance.md when changing the reusable library
 
 Requirements:

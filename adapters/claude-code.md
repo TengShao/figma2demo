@@ -1,6 +1,6 @@
 # Claude Code Adapter
 
-Use this adapter when Claude Code should use Figma2Demo to produce reviewed HTML/MP4 demos from Figma designs.
+Use this adapter when Claude Code should use Figma2Demo to produce reviewed HTML/MP4 demos and optional frontend starter projects from Figma designs.
 
 This adapter is onboarding guidance, not a runtime skill file. Use it before installation; the installed runtime skill does not need to include `adapters/`.
 
@@ -14,6 +14,7 @@ Point Claude Code at these files:
 - any selected `effects/*.md`
 - template-listed `parameters/*.md`
 - `references/maintenance.md`
+- `references/frontend-mode.md`
 - `references/export.md`
 
 ## Required Setup
@@ -29,7 +30,7 @@ Create or update a project-level `CLAUDE.md` with:
 ```markdown
 # Figma2Demo Instructions
 
-Use Figma2Demo to convert Figma designs into reviewed animated HTML demos and MP4 videos.
+Use Figma2Demo to convert Figma designs into reviewed HTML demos, MP4 videos, and optional frontend starter projects.
 
 Before implementation:
 
@@ -48,19 +49,20 @@ Flow:
 4. Implement animation and ask for animation approval.
 5. Before MP4 export, ask whether reusable special requirements should update the current template or become a new template.
 6. Export using references/export.md.
+7. If the user selects Frontend Mode after visual approval or after MP4 export, use references/frontend-mode.md.
 ```
 
 ## Recommended Prompts
 
 ```text
-Use Figma2Demo to create a demo from this Figma link.
+/figma2demo create a demo from this Figma link.
 Template: default-template.
 Demo name: <name>.
 Use <effect ids> effects.
 ```
 
 ```text
-Use Figma2Demo to add a new template for <design family>.
+/figma2demo add a new template for <design family>.
 ```
 
 ## Operating Rules
