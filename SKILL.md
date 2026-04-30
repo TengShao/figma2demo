@@ -38,14 +38,17 @@ Library maintenance mode does not require Figma MCP unless the user asks to vali
 
 Before writing or previewing the static HTML, make an asset inventory for every icon-like layer, logo, vector mark, chart glyph, and custom illustration visible in the target Figma node:
 
-- Record the Figma layer name or id, intended local asset path, export format, and where it appears in the demo.
+- Record a provenance row for each item before visual review: page location, actual Figma instance node id, local asset path, export format, whether it is a whole-node export, and whether any fallback or manual handling was used.
+- Export the actual visible Figma instance node for each listed item, not a reused asset from another same-named component instance. Same-named icons can differ by color, direction, scale, flip, inset, or instance overrides.
 - Export or download each listed item as a complete Figma node whenever possible, preferably SVG, into the demo-local `assets/` folder before using it in HTML/CSS.
 - Preserve the exported node's viewBox, intrinsic size, aspect ratio, rendered bounds, inset, and internal transforms. Do not squeeze, stretch, or reframe any source icon into a different hand-chosen geometry unless the Figma source itself does so.
 - Do not normalize an SVG path to fill its container or rebuild the icon from the path bounding box; Figma component transforms such as inset, scaleX, rotation, masks, and nested groups are part of the source artwork.
 - If whole-node export is unavailable but child vectors are available, only combine them when the original Figma geometry can be preserved exactly, including viewBox, dimensions, rendered bounds, fills, strokes, masks, nested groups, and transforms. Otherwise stop and tell the user which Figma layer is blocked.
 - Do not substitute CSS, emoji, icon fonts, lucide icons, approximate library icons, or manually reassembled child vectors unless the user explicitly accepts a non-1:1 fallback for that specific layer.
 - Use CSS only for layout, masks, sizing, opacity, and animation of exported assets; do not draw the source icon shape with borders, pseudo-elements, gradients, or hand-coded SVG.
-- During visual review, compare icon identity as part of fidelity, not just position and size.
+- Save the provenance table as `output/<demo-slug>/icon-provenance.json` before the visual fidelity gate. Missing provenance blocks the gate.
+- Run `node scripts/check_icon_fidelity.js --html output/<demo-slug>/<demo-slug>.html --provenance output/<demo-slug>/icon-provenance.json` before visual review. The check must fail on inline SVG, CSS pseudo-element drawing, text/emoji/icon-font substitutions, lucide or other icon-library usage, missing exported asset paths, missing actual Figma node ids, non-whole-node exports without an explicit Figma-node fallback reason, or any manual-rebuild flag.
+- During visual review, compare icon identity as part of fidelity, not just position and size. Review icon crops or focused screenshots for dense icon areas such as navigation rails, arrows, service/database marks, composer controls, and right-side cards.
 
 ## Start By Asking
 
@@ -118,7 +121,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 
 1. **Visual fidelity gate**
    - After reading Figma and generating the static HTML replica, show or open the HTML preview for the user.
-   - Confirm that all icon-like layers and vector marks are real exported assets from the Figma source, not approximations.
+   - Confirm that all icon-like layers and vector marks passed the Icon And Vector Asset Gate with provenance tied to actual Figma instance node ids.
    - Ask the user to confirm whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
    - Do not start animation work until the user confirms the visual restoration.
@@ -159,6 +162,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Confirm the preview viewport fits the full fixed stage without cropping, browser-level horizontal scroll, or raw 1920px overflow.
    - Confirm that every visible icon-like layer matches the Figma source asset; icon mismatches are fidelity failures, not acceptable approximations.
    - For directional or transformed icons, verify orientation, stroke/weight, visual inset, and rendered bounds against Figma; do not accept icons that only have the right general shape.
+   - Inspect focused crops for icon-dense regions, not only the full-page screenshot.
    - Invite visual diff comments only at this gate: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
    - Stop and wait for explicit user confirmation before continuing to animation.
