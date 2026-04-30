@@ -1,7 +1,5 @@
 # Figma2Demo
 
----
-
 [English](#english) | [中文](#中文)
 
 <a id="english"></a>
