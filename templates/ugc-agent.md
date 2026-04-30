@@ -1,0 +1,72 @@
+# Template: ugc-agent
+
+Use this template for management-ready product demos that show an agent-style workspace receiving a user request, attaching context files, consulting knowledge or services, and revealing analysis modules in a staged sequence.
+
+## Applies To
+
+- Product screens with a central composer or conversation area.
+- Sidebars or panels that represent uploaded files, knowledge bases, search results, services, or analysis output.
+- Demos where the audience should understand cause and effect between the user's request and the appearing modules.
+
+## Required Inputs
+
+- Figma design URL.
+- `demoName`.
+- The module that starts the animation.
+- The modules that must appear together.
+- The user prompt or task text, if the screen includes a composer.
+- Which files, knowledge sections, service modules, or analysis panels are simulated rather than already visible.
+
+## Visual Restoration Rules
+
+- Rebuild the screen as a fixed 1920x1080 stage unless the user requests another size.
+- Preserve Figma layer positions and real assets.
+- Export exact icon, logo, and vector-mark layers from Figma as assets, preferably SVG, and reference them from the demo-local `assets/` folder. Do not substitute similar-looking icon library icons or recreate icons with CSS.
+- If the design uses a font that is not available locally and cannot be bundled, convert the affected Figma text to vector outlines. If that text must be animated as live text, ask the user whether to provide the font, accept a fallback, or keep the exact outline without typewriter animation.
+- Keep labels, database names, service names, pills, and short menu rows on one line unless the Figma source wraps them.
+- Right-side or downstream modules that are meant to be revealed by the workflow should be hidden in the initial animation state, even if they exist in the static replica for fidelity review.
+
+## Animation Scheme
+
+Start from the module named by the user. If the flow starts in a composer, type or reveal the prompt, perform the send action, then begin downstream module motion.
+
+| phase | module | motion | linked modules | pause after |
+| --- | --- | --- | --- | --- |
+| request | composer or start module | type/reveal, then send or activate | user bubble, file chips | short confirmation hold |
+| context | uploaded files or left knowledge sections | staggered fade/slide | matching file chips | brief reading pause |
+| retrieval | search, database, or best-practice panel | reveal with count/result state | named database/source indicator | result hold |
+| service | service or competitor-analysis panel | reveal after retrieval | named service indicator | short processing pause |
+| synthesis | central or right analysis module | type/reveal generated answer and final panels | supporting evidence modules | final management hold |
+
+## Special Logic
+
+- File chips that simulate uploads should appear after the first sent request and align visually with that user action.
+- If the center workspace begins focused, keep it centered at first. After the trigger is sent, move it to its final position and reveal downstream analysis or search areas.
+- Hide downstream modules until their trigger occurs.
+- Coordinate linked modules by timing rather than proximity alone. Examples:
+  - `UGC白皮书 Database` appears with the `最佳实践` panel or search count.
+  - `竞品分析 Service` appears with the `竞品分析` panel.
+  - Left sidebar knowledge sections appear in sync with corresponding uploaded file chips.
+- If the user says one module appears only after another finishes, include an actual delay after the preceding animation completes.
+
+## Effect Pack Guidance
+
+- Use `typewriter` when generated answers or long user-visible generated text should appear character by character.
+- Use `cursor-send` when the demo shows the user typing, clicking send, or activating the composer.
+- Avoid applying typewriter behavior to rows, menu items, pills, or file chips that should appear as complete objects.
+
+## Export Defaults
+
+- Duration: 12 seconds.
+- Resolution: 1920x1080.
+- FPS: 24.
+- Format: MP4.
+
+## Acceptance Checks
+
+- Visual restoration matches the source Figma before animation begins.
+- All icon-like layers come from exported Figma assets rather than CSS approximations.
+- Any unavailable special font is bundled or represented by vector outlines.
+- The start module, linked modules, and downstream modules follow the requested cause-and-effect order.
+- No right-side or downstream module appears before its trigger.
+- The final hold is clean and management-ready.

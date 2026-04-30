@@ -1,6 +1,6 @@
 interface:
-  display_name: "Figma2Demo-UGCAgent"
-  short_description: "Figma to reviewed animated HTML demo and MP4 export."
-  default_prompt: "Use $figma2demo-ugcagent to convert this Figma design into a 1920x1080 HTML demo, confirm visual fidelity with me, confirm animation with me, then export MP4."
+  display_name: "Figma2Demo"
+  short_description: "Figma MCP-backed animated HTML/MP4 demo export, with guided template and effect-pack maintenance."
+  default_prompt: "Use $figma2demo to either create a reviewed animated HTML/MP4 demo from Figma after checking Figma MCP access, or guide me through adding/modifying templates, effect packs, and parameters."
 policy:
   allow_implicit_invocation: true

@@ -1,0 +1,53 @@
+{
+  "templates": [
+    {
+      "id": "ugc-agent",
+      "title": "Agent Workspace Demo",
+      "file": "templates/ugc-agent.md",
+      "summary": "A reviewed product-operation demo pattern for agent workspaces with staged upload, search, service, and analysis modules.",
+      "tags": ["agent", "workspace", "management-demo"],
+      "parameters": ["agentic-workflow-rhythm"],
+      "touchedAreas": ["timeline", "linked-modules", "workspace-layout", "export-defaults"],
+      "conflictsWith": [],
+      "defaults": {
+        "duration": 12,
+        "fps": 24,
+        "width": 1920,
+        "height": 1080,
+        "format": "mp4"
+      }
+    }
+  ],
+  "effects": [
+    {
+      "id": "typewriter",
+      "title": "Typewriter Text",
+      "file": "effects/typewriter.md",
+      "summary": "Reveal selected generated text character by character with deterministic timing.",
+      "tags": ["text", "typing", "generated-content"],
+      "touchedAreas": ["text-reveal", "timeline"],
+      "conflictsWith": ["sweep-text-reveal"]
+    },
+    {
+      "id": "cursor-send",
+      "title": "Cursor Send Interaction",
+      "file": "effects/cursor-send.md",
+      "summary": "Animate a cursor through input, send, and post-send cleanup behavior.",
+      "tags": ["cursor", "input", "send"],
+      "touchedAreas": ["cursor", "composer", "send-action", "timeline"],
+      "conflictsWith": ["static-cursor", "auto-hide-composer"]
+    }
+  ],
+  "parameters": [
+    {
+      "id": "agentic-workflow-rhythm",
+      "title": "Agentic Workflow Rhythm",
+      "file": "parameters/agentic-workflow-rhythm.md",
+      "summary": "Advanced timing guidance for demos that show an agent receiving input, gathering context, and revealing downstream modules.",
+      "tags": ["advanced", "timing", "workflow"],
+      "type": "timing",
+      "touchedAreas": ["timeline", "linked-modules", "workspace-layout"],
+      "conflictsWith": ["continuous-reveal", "instant-all-modules"]
+    }
+  ]
+}

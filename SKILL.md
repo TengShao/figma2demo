@@ -1,21 +1,92 @@
 ---
-name: figma2demo-ugcagent
-description: Convert Figma designs into faithful HTML demos with staged typewriter/text animation, inter-module timing/linkage, and 1920x1080 MP4 export. Use when the user asks to turn a Figma mockup into an animated demo video, HTML prototype, product walkthrough, or management-facing demo and needs Figma layer fidelity plus video export.
+name: figma2demo
+description: Convert Figma designs into faithful reviewed HTML demos and MP4 videos using user-selected templates, optional effect packs, reusable parameters, staged animation review, and deterministic frame export.
 ---
 
-# Figma2Demo-UGCAgent
+# Figma2Demo
 
-Use this skill to turn a Figma design into a faithful animated HTML demo and export it as an MP4. Preserve the successful workflow from the UGC Agent demo: read Figma layer data first, rebuild the screen in HTML, confirm visual fidelity with the user, choreograph realistic UI operation timing, confirm the animation with the user, then export video.
+Use this skill to turn a Figma design into a faithful animated HTML demo and export it as an MP4. The core workflow is generic: read Figma first, rebuild the screen in HTML, confirm visual fidelity, apply the selected template and optional effect packs, confirm animation, then export video.
+
+Templates define repeatable demo schemes for a family of designs. Effect packs are ordinary-user options for reusable animation treatments. Parameters are template-maintenance files for special logic, rhythm, or export rules; do not surface parameters in the ordinary run flow unless the user asks to maintain templates.
+
+This skill has two modes:
+
+- **Demo production mode**: create an HTML/MP4 demo from a Figma design.
+- **Library maintenance mode**: add, modify, or remove reusable templates, effect packs, or parameters.
+
+## Dependency Check
+
+Demo production mode requires a working Figma MCP connection. Do this check before rebuilding or animating anything:
+
+1. Confirm that Figma MCP tools are available in the current agent environment.
+2. After the user provides a Figma URL, extract the file key and node id, then make a minimal Figma MCP read call to confirm the file and node are accessible.
+3. Confirm that the MCP response includes enough layer data, design context, screenshot data, or export URLs to support 1:1 restoration and asset export.
+4. If the Figma MCP is missing, disconnected, unauthorized, or unable to read the requested file/node, stop and tell the user exactly what dependency failed. Ask them to enable/connect Figma MCP, grant file access, or provide a reachable Figma URL.
+5. Do not proceed from screenshots or manual visual guesses unless the user explicitly asks to bypass the Figma MCP dependency and accepts that the result is no longer guaranteed 1:1.
+
+Library maintenance mode does not require Figma MCP unless the user asks to validate a template, effect, or parameter against a live Figma design.
+
+## Non-Negotiable Fidelity Rules
+
+- Restore the Figma design 1:1. Layer position, size, typography, colors, borders, radii, shadows, opacity, blur, images, masks, and interaction states are all source-of-truth details.
+- Icons and logo-like vector marks must be exported from Figma as real vector assets, preferably SVG, and referenced from the demo-local `assets/` folder. Do not recreate icons with CSS boxes, pseudo-elements, emoji, icon fonts, or approximate icon libraries.
+- If a design uses a special font that is not available locally and cannot be bundled for the demo, convert the affected text to vector outlines from Figma and use those outlines for visual fidelity.
+- If outlined text would conflict with requested editable or typewriter text, stop and ask the user whether to provide the font file, accept a fallback font, or keep the exact outline without text animation.
+- Do not simplify detailed Figma artwork into CSS approximations unless the user explicitly approves that tradeoff.
 
 ## Start By Asking
 
-Before implementation, ask these three questions and wait for the user's answers:
+If the user asks to add, modify, improve, rename, remove, or review a template, effect pack, or parameter, enter **Library maintenance mode** instead of demo production mode.
 
-1. Figma 设计稿的链接是什么？
-2. 从哪个模块的出现作为动画起点？
-3. 哪些模块需要联动出现？
+For demo production mode, run the Figma MCP dependency check and collect these required inputs before implementation:
 
-If the user has not specified duration, resolution, or output format, assume 10-15 seconds, 1920x1080, MP4 unless the context says otherwise.
+1. Figma design URL.
+2. `demoName`: the user-facing demo name.
+3. Main template id.
+4. Which module starts the animation.
+5. Which modules must appear or react together.
+
+If the user has not specified duration, resolution, or output format, use template defaults when present, otherwise assume 10-15 seconds, 1920x1080, 24 fps, MP4.
+
+## Template And Effect Selection
+
+Read `catalog.json` before choosing a template or effect pack.
+
+- If the user did not specify a template id, show the available `templates[]` entries from `catalog.json` and stop for selection.
+- After a template is selected, read the template file listed in `catalog.json`.
+- Silently load any parameters listed by the template's catalog entry. Parameters are not ordinary user-facing choices.
+- If the user asks for effect packs, read only the selected files from `effects[]`.
+- If the user asks what effect packs are available, show the `effects[]` entries from `catalog.json`.
+- Do not auto-enable effect packs when the user has not selected them.
+
+Use `touchedAreas` and `conflictsWith` from `catalog.json` to detect conflicts among the template, selected effects, and loaded parameters. If any selected items conflict, stop and ask the user to decide for this run. Do not write that decision back to the template library unless explicitly asked.
+
+## Library Maintenance Mode
+
+When the user asks to add, modify, improve, rename, remove, or review reusable templates, effect packs, or parameters, read `references/maintenance.md` and follow its guided flow. Make maintenance feel guided, not file-centric.
+
+## Naming And Output Paths
+
+Use the original `demoName` as the readable HTML title and demo label. Also derive a filesystem-safe slug from it:
+
+- lowercase
+- replace non-alphanumeric runs with `-`
+- trim leading and trailing `-`
+- if the result is empty, ask the user for a different `demoName`
+
+Use the slug to isolate generated artifacts:
+
+```text
+output/<demo-slug>/
+  <demo-slug>.html
+  <demo-slug>.mp4
+  assets/
+scratch/<demo-slug>/
+  capture_html_frames.js
+  encode_frames.swift
+  encode_frames_ffmpeg.js
+  frames/
+```
 
 ## Mandatory Flow Control
 
@@ -28,29 +99,33 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Do not start animation work until the user confirms the visual restoration.
 
 2. **Animation gate**
-   - After the user confirms the visual stage, implement the animation timeline.
+   - After the user confirms the visual stage, implement the template-driven animation timeline and selected effect packs.
    - Preview the animated HTML for the user.
-   - Ask the user to confirm whether the animation timing, linkage, cursor behavior, typewriter effects, and rhythm are acceptable.
+   - Ask the user to confirm whether timing, linkage, cursor behavior, text effects, and rhythm are acceptable.
    - If the user gives animation corrections, patch the timeline and preview again.
    - Do not export the MP4 until the user confirms the animation.
 
 3. **MP4 export gate**
-   - Only after animation approval, capture and encode the final MP4.
+   - After animation approval and before MP4 export, check whether this conversation introduced reusable special requirements that could improve the current template or become a new template.
+   - If reusable requirements exist, ask whether the user wants to update the current template, create a new template, or keep the requirements only for this demo. If they choose to persist changes, read `references/maintenance.md`.
+   - Only after this persistence check is resolved, capture and encode the final MP4.
    - Verify video metadata and report the output path.
 
 ## Workflow
 
 1. **Read Figma before coding**
    - Extract the Figma file key and node id from the URL.
-   - Use Figma tools to get metadata, design context, screenshots, and asset URLs.
+   - Use Figma MCP tools to get metadata, design context, screenshots, and asset URLs.
+   - Treat failed MCP access as a blocker for 1:1 restoration unless the user explicitly approves a non-Figma fallback.
    - Treat Figma layer positions, sizes, text, colors, borders, radii, shadows, and image assets as the source of truth.
-   - Export or download the exact icons and bitmap assets from Figma. Do not replace them with approximate icon-library icons unless the design itself uses that library and the match is exact.
+   - Export or download the exact icons, logos, vector marks, bitmap assets, and outlined special-font text from Figma. Do not replace them with CSS approximations or approximate icon-library icons.
 
 2. **Rebuild a 1:1 static HTML stage**
-   - Use a fixed 1920x1080 stage for video work unless the user requests another size.
+   - Use the requested or template-defined stage size, defaulting to 1920x1080.
    - Use absolute positioning when fidelity matters more than responsiveness.
    - Match Figma typography, text weights, line heights, colors, borders, spacing, corner radii, and shadows.
-   - Keep assets in an output-local `assets/` folder and reference them directly.
+   - Use exported vector assets for icon-like layers; never draw them with CSS for convenience.
+   - Keep assets in the demo-local `assets/` folder and reference them directly.
    - Build the actual interface as the first screen. Do not add marketing copy, extra slogans, or explanatory UI unless requested.
 
 3. **Preview and confirm visual fidelity**
@@ -60,116 +135,57 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Stop and wait for explicit user confirmation before continuing to animation.
 
 4. **Define the animation timeline**
+   - Follow the selected template and loaded parameters.
+   - Apply selected effect packs only where they fit the user's requested module flow and the Figma design.
    - Make a small timing table before heavy animation work:
      - `time`: when the event starts
      - `module`: the UI element or group
      - `motion`: typewriter, fade, slide, panel move, cursor click, etc.
      - `linked_to`: any module that must appear in sync
      - `pause_after`: intentional hold before the next event
-   - Start from the module named by the user. If the demo begins from an input box, type the prompt in the composer, click/send, then begin the downstream panel motion.
+   - Start from the module named by the user.
    - Use named CSS classes or CSS variables for timing, so user feedback can be patched precisely.
 
-5. **Use typewriter text deliberately**
-   - User-visible generated text should appear with a typewriter effect when the user asks for "文字逐字出现" or "打字机".
-   - Avoid vertical mask/sweep reveals for text that should type character by character.
-   - Wrap typewriter text into per-character spans and animate opacity or width with staggered delay.
-   - Exclude elements that should appear with their container, such as document rows, menu rows, or pills the user says should appear as one piece.
-   - Keep no-wrap text as no-wrap; do not let labels like database names wrap unless Figma shows wrapping.
-
-6. **Choreograph realistic rhythm**
-   - Avoid making every component appear continuously with no breathing room.
-   - Add short pauses between meaningful phases: prompt sent, file upload, reading, searching, service result, analysis module.
-   - If file chips simulate user upload, delay them after the first sent message and align them with that user bubble.
-   - If a center workspace starts focused, keep it centered initially; after the trigger is sent, move it to its final position and reveal the right-side analysis/search area.
-   - Hide right-side modules until their trigger occurs.
-   - Coordinate linked modules by timing, not just by visual proximity. Examples:
-     - `UGC白皮书 Database` appears with the "最佳实践" panel/search count.
-     - `竞品分析 Service` appears with the "竞品分析" panel.
-     - Left sidebar knowledge sections appear in sync with corresponding uploaded file chips.
-   - If the user says a module should appear only after another finishes, add an actual delay after the preceding animation completes.
-
-7. **Handle cursor and send behavior**
-   - If a cursor is shown, animate it only while it is part of the simulated operation.
-   - After clicking send, fade or remove the cursor if the user expects the mouse to disappear.
-   - Do not remove the composer/input panel after send unless the user explicitly requests that; often only the cursor should disappear.
-
-8. **Preview and confirm animation before video export**
+5. **Preview and confirm animation before video export**
    - Show the animated HTML preview after the timeline is implemented.
-   - Invite animation comments at this gate: timing, sequencing, linked appearances, typewriter behavior, cursor behavior, motion direction, pauses, and total duration.
+   - Invite animation comments at this gate: timing, sequencing, linked appearances, text effects, cursor behavior, motion direction, pauses, and total duration.
    - Address browser diff comments precisely.
    - After significant timing changes, inspect screenshots or browser frames at key timestamps.
-   - Stop and wait for explicit user confirmation before exporting the final MP4, unless the user asks to export anyway.
+   - Once animation is approved, perform the reusable requirement persistence check before exporting.
+   - Stop and wait for explicit user confirmation before exporting the final MP4. Only skip the persistence check if the user explicitly says to bypass review checkpoints and the template persistence check.
 
-9. **Export MP4**
-   - Copy the bundled export templates from this skill before writing new capture/encode code:
-     - `scripts/capture_html_frames.js`
-     - `scripts/encode_frames.swift`
-     - `scripts/encode_frames_ffmpeg.js`
-   - Place the copied scripts in the task-local scratch folder, usually `scratch/demo-video/`, and patch only task-specific defaults such as HTML path, duration, fps, resolution, Chrome path, and output paths.
-   - Capture frames at the requested resolution, defaulting to 1920x1080.
-   - Use 24 fps unless the user requests another frame rate.
+6. **Export MP4**
+   - Read `references/export.md`.
+   - Copy the bundled export templates from this skill before writing new capture/encode code.
+   - Place the copied scripts in `scratch/<demo-slug>/` and patch only task-specific defaults.
+   - Capture frames at the requested or template-defined resolution.
+   - Use 24 fps unless the user or template requests another frame rate.
    - Seek animations deterministically by time when possible, rather than relying only on realtime screen recording.
    - Encode MP4/H.264 with AVFoundation/Swift by default on macOS.
    - If Swift/AVFoundation fails, or the environment is not macOS, fall back to ffmpeg with H.264 (`libx264`, then `h264_videotoolbox` on macOS if available).
    - Verify the final file's width, height, duration, and playable container metadata.
 
+## Manual Library Editing
+
+For guided library changes, read `references/maintenance.md`.
+
+- Add complete demo schemes to `templates/` by copying `templates/_template.md`.
+- Add ordinary user-facing animation treatments to `effects/` by copying `effects/_effect.md`.
+- Add template parameters for logic, timing, or export behavior to `parameters/` by copying `parameters/_parameter.md`.
+- Update `catalog.json` whenever a template, effect, or parameter is added, renamed, moved, or removed.
+- Keep all metadata in `catalog.json`; do not duplicate ids, summaries, tags, or conflict keys in Markdown frontmatter.
+- Prefer rules and pseudocode over reusable JS/CSS snippets unless the user explicitly asks for implementation code.
+
 ## Bundled Export Scripts
 
-Use the bundled scripts as the default MP4 export path after the animation gate is approved. The preferred encoding path is AVFoundation first, ffmpeg fallback second.
-
-```bash
-node scratch/demo-video/capture_html_frames.js \
-  --html output/demo-video/figma-replica.html \
-  --out scratch/demo-video/frames \
-  --duration 12 \
-  --fps 24 \
-  --width 1920 \
-  --height 1080
-
-swift scratch/demo-video/encode_frames.swift \
-  --frames scratch/demo-video/frames \
-  --out output/demo-video/ugc-agent-demo.mp4 \
-  --fps 24 \
-  --width 1920 \
-  --height 1080
-```
-
-If Swift/AVFoundation fails, use the ffmpeg fallback:
-
-```bash
-node scratch/demo-video/encode_frames_ffmpeg.js \
-  --frames scratch/demo-video/frames \
-  --out output/demo-video/ugc-agent-demo.mp4 \
-  --fps 24 \
-  --width 1920 \
-  --height 1080
-```
-
-`capture_html_frames.js` supports deterministic seeking through either `window.__seekDemoTime(seconds)`, `window.__setDemoTime(seconds)`, or the Web Animations API. Prefer adding one of those page-level seek functions when CSS/JS animations need exact frame capture.
+Use the bundled scripts as the default MP4 export path after the animation gate is approved. Read `references/export.md` for the exact copy, capture, encode, and verification commands.
 
 ## Quality Bar
 
 - The demo should look like the Figma design, not like a redesigned approximation.
-- Icons must match the Figma source.
+- Icons, logos, and vector marks must be exported assets from Figma, not CSS recreations.
+- Missing special fonts must be bundled or converted to vector outlines.
 - Text should not wrap, overlap, or be clipped unless the source design does so.
 - Timing should feel like a real product operation: action, response, pause, next result.
 - Linked modules should be visibly synchronized.
 - The final MP4 should be management-ready: no debug outlines, no comment markers, no unintended cursor, no browser chrome.
-
-## Preferred Output Structure
-
-Use task-specific names when appropriate, but this structure works well:
-
-```text
-output/demo-video/
-  figma-replica.html
-  ugc-agent-demo.mp4
-  assets/
-scratch/demo-video/
-  capture_html_frames.js
-  encode_frames.swift
-  encode_frames_ffmpeg.js
-  frames/
-```
-
-Keep scripts task-local unless they become genuinely reusable across multiple demos.
