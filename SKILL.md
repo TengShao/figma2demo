@@ -30,6 +30,7 @@ Library maintenance mode does not require Figma MCP unless the user asks to vali
 
 - Restore the Figma design 1:1. Layer position, size, typography, colors, borders, radii, shadows, opacity, blur, images, masks, and interaction states are all source-of-truth details.
 - Icons and logo-like vector marks must be exported from Figma as real vector assets, preferably whole-node SVG, and referenced from the demo-local `assets/` folder. Do not recreate icons with CSS boxes, pseudo-elements, emoji, icon fonts, approximate icon libraries, or manually reassembled child vectors.
+- Do not collapse the Figma layer tree into only the largest visible objects. Opacity layers, overlay fills, masks, blend modes, clipping groups, and stacking order are source-of-truth details.
 - If a design uses a special font that is not available locally and cannot be bundled for the demo, convert the affected text to vector outlines from Figma and use those outlines for visual fidelity.
 - If outlined text would conflict with requested editable or typewriter text, stop and ask the user whether to provide the font file, accept a fallback font, or keep the exact outline without text animation.
 - Do not simplify detailed Figma artwork into CSS approximations unless the user explicitly approves that tradeoff.
@@ -49,6 +50,18 @@ Before writing or previewing the static HTML, make an asset inventory for every 
 - Save the provenance table as `output/<demo-slug>/icon-provenance.json` before the visual fidelity gate. Missing provenance blocks the gate.
 - Run `node scripts/check_icon_fidelity.js --html output/<demo-slug>/<demo-slug>.html --provenance output/<demo-slug>/icon-provenance.json` before visual review. The check must fail on inline SVG, CSS pseudo-element drawing, text/emoji/icon-font substitutions, lucide or other icon-library usage, missing exported asset paths, missing actual Figma node ids, non-whole-node exports without an explicit Figma-node fallback reason, or any manual-rebuild flag.
 - During visual review, compare icon identity as part of fidelity, not just position and size. Review icon crops or focused screenshots for dense icon areas such as navigation rails, arrows, service/database marks, composer controls, and right-side cards.
+
+## Instance Context And Layer Tree Gate
+
+Before the static visual gate, preserve instance context and child-layer structure for repeated components and complex regions:
+
+- Treat every visible Figma instance as context-specific. Do not use a global selector or shared CSS transform to fix all same-named icons, arrows, chips, controls, or cards. Shared CSS may set neutral layout primitives, but instance-specific color, direction, scale, flip, inset, opacity, transform, and bounds must come from the actual Figma node export or an instance-scoped selector tied to provenance.
+- For complex regions such as cards, thumbnails, pills, chips, list rows, media previews, and right-side modules, create a child-layer inventory before coding. Include Figma node id, layer name, type, bounds, opacity, blend mode, mask/clipping state, fill/overlay role, z-order, and implementation selector or asset path.
+- Save that inventory as `output/<demo-slug>/layer-provenance.json`. Missing entries for visible overlay, mask, opacity, fill, or blend layers block the visual gate.
+- Run `node scripts/check_layer_provenance.js --provenance output/<demo-slug>/layer-provenance.json` before visual review. The check must fail on missing child-layer rows, missing bounds or z-order, unimplemented layers, or sensitive opacity/mask/blend/fill layers without an implementation selector or asset path.
+- Implement transparent overlays, masks, blend layers, clipping groups, and fill rectangles explicitly. Do not assume they are part of the underlying image unless the exported Figma node already includes them.
+- Preserve stacking order inside complex regions: background/image, overlay or mask layers, foreground pills/cards, text, and icons must follow the Figma layer tree.
+- If a shared class, selector, or asset is modified after preview, enumerate every page location that uses it and re-check focused crops for all of those locations before asking for visual approval again.
 
 ## Start By Asking
 
@@ -96,6 +109,9 @@ Use the slug to isolate generated artifacts:
 output/<demo-slug>/
   <demo-slug>.html
   <demo-slug>.mp4
+  icon-provenance.json
+  layer-provenance.json
+  review-crops/
   assets/
 scratch/<demo-slug>/
   capture_html_frames.js
@@ -122,6 +138,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 1. **Visual fidelity gate**
    - After reading Figma and generating the static HTML replica, show or open the HTML preview for the user.
    - Confirm that all icon-like layers and vector marks passed the Icon And Vector Asset Gate with provenance tied to actual Figma instance node ids.
+   - Confirm that complex regions passed the Instance Context And Layer Tree Gate, including overlays, masks, opacity layers, and stacking order.
    - Ask the user to confirm whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
    - Do not start animation work until the user confirms the visual restoration.
@@ -147,6 +164,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Treat failed MCP access as a blocker for 1:1 restoration unless the user explicitly approves a non-Figma fallback.
    - Treat Figma layer positions, sizes, text, colors, borders, radii, shadows, and image assets as the source of truth.
    - Complete the Icon And Vector Asset Gate. Export or download the exact icons, logos, vector marks, bitmap assets, and outlined special-font text from Figma. Do not replace them with CSS approximations or approximate icon-library icons.
+   - Complete the Instance Context And Layer Tree Gate for repeated components and complex regions.
 
 2. **Rebuild a 1:1 static HTML stage**
    - Use the requested or template-defined stage size, defaulting to 1920x1080.
@@ -155,6 +173,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Match Figma typography, text weights, line heights, colors, borders, spacing, corner radii, and shadows.
    - Use exported vector assets for icon-like layers; never draw them with CSS for convenience.
    - Keep assets in the demo-local `assets/` folder and reference them directly.
+   - Preserve complex-region child layers and z-order from `layer-provenance.json`.
    - Build the actual interface as the first screen. Do not add marketing copy, extra slogans, or explanatory UI unless requested.
 
 3. **Preview and confirm visual fidelity**
@@ -162,7 +181,8 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Confirm the preview viewport fits the full fixed stage without cropping, browser-level horizontal scroll, or raw 1920px overflow.
    - Confirm that every visible icon-like layer matches the Figma source asset; icon mismatches are fidelity failures, not acceptable approximations.
    - For directional or transformed icons, verify orientation, stroke/weight, visual inset, and rendered bounds against Figma; do not accept icons that only have the right general shape.
-   - Inspect focused crops for icon-dense regions, not only the full-page screenshot.
+   - Inspect focused crops for icon-dense and layer-dense regions, not only the full-page screenshot.
+   - After changes to any shared selector, shared asset, or reused component, inspect focused crops for every affected instance before re-requesting approval.
    - Invite visual diff comments only at this gate: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
    - Stop and wait for explicit user confirmation before continuing to animation.

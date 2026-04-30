@@ -29,7 +29,7 @@ function usage() {
     "  node scripts/check_icon_fidelity.js --html output/<demo>/<demo>.html --provenance output/<demo>/icon-provenance.json",
     "",
     "Provenance JSON must be an array of rows with:",
-    "  pageLocation, figmaNodeId, assetPath, exportFormat, wholeNodeExport, manualRebuild",
+    "  pageLocation, figmaNodeId, assetPath, exportFormat, wholeNodeExport, manualRebuild, implementationSelector",
     "Fallback rows also need fallbackReason.",
   ].join("\n");
 }
@@ -64,6 +64,7 @@ function scanForbidden(text, sourceName) {
     ["icon font element", /<i\b[^>]*class=["'][^"']*(?:icon|fa-|material-icons?)[^"']*["']/i],
     ["text arrow/operator icon", /[›‹→←➜➔➝⌘＋+]/u],
     ["border-drawn icon class", /\.(?:[\w-]*icon[\w-]*|[\w-]*arrow[\w-]*|[\w-]*chevron[\w-]*)[^{]*\{[^}]*\bborder(?:-(?:top|right|bottom|left))?\s*:/i],
+    ["global icon/arrow transform", /(?:^|})\s*(?:\.[^{},]*(?:icon|arrow|chevron)[^{},]*|img[^{},]*(?:icon|arrow|chevron)[^{},]*)\s*\{[^}]*\btransform\s*:/i],
   ];
 
   const issues = [];
@@ -86,7 +87,8 @@ function loadProvenance(file) {
 function validateProvenance(rows, provenanceFile) {
   const issues = [];
   const baseDir = path.dirname(provenanceFile);
-  const required = ["pageLocation", "figmaNodeId", "assetPath", "exportFormat", "wholeNodeExport", "manualRebuild"];
+  const required = ["pageLocation", "figmaNodeId", "assetPath", "exportFormat", "wholeNodeExport", "manualRebuild", "implementationSelector"];
+  const assetOwners = new Map();
 
   rows.forEach((row, index) => {
     for (const key of required) {
@@ -113,6 +115,12 @@ function validateProvenance(rows, provenanceFile) {
         : path.resolve(baseDir, row.assetPath);
       if (!fs.existsSync(assetPath)) {
         issues.push(`provenance[${index}]: assetPath does not exist: ${row.assetPath}`);
+      }
+      const owner = assetOwners.get(row.assetPath);
+      if (owner && owner !== row.figmaNodeId && !row.sharedAssetReason) {
+        issues.push(`provenance[${index}]: assetPath is reused across different Figma nodes without sharedAssetReason: ${row.assetPath}`);
+      } else {
+        assetOwners.set(row.assetPath, row.figmaNodeId);
       }
     }
   });
