@@ -2,6 +2,8 @@
 
 Use this adapter when OpenClaw should expose Figma2Demo as a slash-command workflow.
 
+This adapter is onboarding guidance, not a runtime skill file. Use it before installation; the installed runtime skill does not need to include `adapters/`.
+
 ## Entry Point
 
 Recommended top-level command:

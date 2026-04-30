@@ -13,7 +13,7 @@ Figma2Demo is a reusable skill package for turning Figma designs into reviewed, 
 Copy this prompt to your agent:
 
 ```text
-Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agent. Decide where this agent keeps reusable skills or instructions, copy the required files there, configure the matching adapter from adapters/, and tell me how to reload the agent.
+Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agent. Use the matching adapter in adapters/ as onboarding guidance, but do not treat adapters/ as a runtime dependency. Copy the runtime skill files only, then tell me how to reload the agent.
 ```
 
 Then create a demo with:
@@ -27,6 +27,8 @@ Use typewriter and cursor-send effects.
 ```
 
 ### Agent Adapters
+
+Adapters are onboarding guides. Read the matching adapter before installation; the installed runtime skill only needs `SKILL.md`, `catalog.json`, `templates/`, `effects/`, `parameters/`, `references/`, and `scripts/`.
 
 | Agent | Adapter | Entry |
 | --- | --- | --- |
@@ -57,7 +59,7 @@ Use typewriter and cursor-send effects.
 
 ```text
 SKILL.md                  Core workflow and quality rules
-adapters/                 Agent-specific setup notes
+adapters/                 Agent-specific onboarding notes, not runtime files
 catalog.json              Template, effect, and parameter index
 templates/                Reusable demo schemes
 effects/                  Optional animation effect packs
@@ -89,7 +91,7 @@ Figma2Demo 是一个可复用技能包，用来把 Figma 设计稿还原成可�
 把这段提示词复制给你的 Agent：
 
 ```text
-Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agent. Decide where this agent keeps reusable skills or instructions, copy the required files there, configure the matching adapter from adapters/, and tell me how to reload the agent.
+Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agent. Use the matching adapter in adapters/ as onboarding guidance, but do not treat adapters/ as a runtime dependency. Copy the runtime skill files only, then tell me how to reload the agent.
 ```
 
 然后这样创建演示：
@@ -103,6 +105,8 @@ Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agen
 ```
 
 ### Agent 适配
+
+`adapters/` 是接入说明，不是运行时依赖。安装前读取对应 adapter；最终安装的技能目录只需要 `SKILL.md`、`catalog.json`、`templates/`、`effects/`、`parameters/`、`references/` 和 `scripts/`。
 
 | Agent | 适配文件 | 入口 |
 | --- | --- | --- |
@@ -133,7 +137,7 @@ Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agen
 
 ```text
 SKILL.md                  核心流程和质量规则
-adapters/                 不同 Agent 的适配说明
+adapters/                 不同 Agent 的接入说明，不是运行时文件
 catalog.json              模板、特效包、参数索引
 templates/                可复用演示模板
 effects/                  可选动画特效包

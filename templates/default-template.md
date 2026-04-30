@@ -20,6 +20,8 @@ Use this template for management-ready product demos that show an agent-style wo
 ## Visual Restoration Rules
 
 - Rebuild the screen as a fixed 1920x1080 stage unless the user requests another size.
+- Present that fixed stage through a browser preview shell that scales it to fit the current viewport without cropping or horizontal scrolling; do not let the raw 1920px-wide stage define the preview page width.
+- Keep preview scaling separate from export sizing so MP4 capture remains exactly 1920x1080 unless the user requests another resolution.
 - Preserve Figma layer positions and real assets.
 - Export exact icon, logo, and vector-mark layers from Figma as assets, preferably SVG, and reference them from the demo-local `assets/` folder. Do not substitute similar-looking icon library icons or recreate icons with CSS.
 - If the design uses a font that is not available locally and cannot be bundled, convert the affected Figma text to vector outlines. If that text must be animated as live text, ask the user whether to provide the font, accept a fallback, or keep the exact outline without typewriter animation.
@@ -67,6 +69,7 @@ Start from the module named by the user. If the flow starts in a composer, type 
 - Visual restoration matches the source Figma before animation begins.
 - All icon-like layers come from exported Figma assets rather than CSS approximations.
 - Any unavailable special font is bundled or represented by vector outlines.
+- Browser preview shows the whole fixed stage fitted inside the viewport, while export frames remain at the requested resolution.
 - The start module, linked modules, and downstream modules follow the requested cause-and-effect order.
 - No right-side or downstream module appears before its trigger.
 - The final hold is clean and management-ready.

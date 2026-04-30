@@ -2,6 +2,8 @@
 
 Use this adapter when Hermes or another non-Codex agent should use Figma2Demo.
 
+This adapter is onboarding guidance, not a runtime skill file. Use it before installation; the installed runtime skill does not need to include `adapters/`.
+
 ## Context To Load
 
 Load the minimum files needed for the requested task:

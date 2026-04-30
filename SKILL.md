@@ -88,6 +88,17 @@ scratch/<demo-slug>/
   frames/
 ```
 
+## HTML Preview Contract
+
+Every generated demo HTML must separate the export stage from the browser preview shell:
+
+- Keep the real demo stage at the requested or template-defined export size, defaulting to 1920x1080.
+- Wrap the fixed stage in a preview shell that scales the stage down to fit the current browser viewport without cropping or horizontal scrolling.
+- Compute the preview scale from both viewport width and height, preserve aspect ratio, and center the stage.
+- Do not use CSS zoom as the only scaling mechanism; use a standards-compatible transform or equivalent layout that works in browser previews.
+- Keep MP4 capture deterministic by capturing the unscaled stage at the requested export resolution. Preview-only scaling must not change export frame dimensions.
+- When opening the visual or animated HTML preview, verify that the whole stage is visible in the available browser viewport and that the page does not appear as a raw 1920px-wide canvas.
+
 ## Mandatory Flow Control
 
 This workflow has three required user-confirmation gates. Do not skip them, even if the user asks for the final MP4 in the first message, unless the user explicitly says to bypass review checkpoints.
@@ -122,6 +133,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 
 2. **Rebuild a 1:1 static HTML stage**
    - Use the requested or template-defined stage size, defaulting to 1920x1080.
+   - Implement the HTML preview shell from the HTML Preview Contract before the first preview.
    - Use absolute positioning when fidelity matters more than responsiveness.
    - Match Figma typography, text weights, line heights, colors, borders, spacing, corner radii, and shadows.
    - Use exported vector assets for icon-like layers; never draw them with CSS for convenience.
@@ -130,6 +142,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 
 3. **Preview and confirm visual fidelity**
    - Show the static HTML preview before adding animation.
+   - Confirm the preview viewport fits the full fixed stage without cropping, browser-level horizontal scroll, or raw 1920px overflow.
    - Invite visual diff comments only at this gate: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
    - Stop and wait for explicit user confirmation before continuing to animation.

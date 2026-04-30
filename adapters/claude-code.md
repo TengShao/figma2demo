@@ -2,6 +2,8 @@
 
 Use this adapter when Claude Code should use Figma2Demo to produce reviewed HTML/MP4 demos from Figma designs.
 
+This adapter is onboarding guidance, not a runtime skill file. Use it before installation; the installed runtime skill does not need to include `adapters/`.
+
 ## Context To Load
 
 Point Claude Code at these files:
