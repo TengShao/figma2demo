@@ -26,7 +26,7 @@ Use this template for management-ready product demos that show an agent-style wo
 - Follow Static Fidelity Enforcement from `SKILL.md` before visual approval.
 - For this template, the icon provenance inventory must include navigation icons, toolbar icons, connector marks, chart glyphs, arrows, and logo-like vector layers.
 - The layer provenance inventory must include cards, thumbnails, pills, chips, list rows, media previews, and right-side modules.
-- The layout provenance inventory must include headings, counters, pills, chips, badges, buttons, composer controls, list rows, and auto-layout groups.
+- The layout provenance inventory must include headings, counters, pills, chips, badges, buttons, composer controls, list rows, auto-layout groups, and text-plus-icon/control pairs.
 - If the design uses a font that is not available locally and cannot be bundled, convert the affected Figma text to vector outlines. If that text must be animated as live text, ask the user whether to provide the font, accept a fallback, or keep the exact outline without typewriter animation.
 - Keep labels, database names, service names, pills, and short menu rows on one line unless the Figma source wraps them.
 - Right-side or downstream modules that are meant to be revealed by the workflow should be hidden in the initial animation state, even if they exist in the static replica for fidelity review.
@@ -71,6 +71,7 @@ Start from the module named by the user. If the flow starts in a composer, type 
 
 - Visual restoration matches the source Figma before animation begins.
 - Static fidelity is proven with provenance artifacts, passing checks, and required focused crops before visual approval is requested.
+- Spacing-sensitive text groups do not rely on generic clipping and do not move or overlap sibling icons, controls, counters, or chevrons.
 - Any unavailable special font is bundled or represented by vector outlines.
 - Browser preview shows the whole fixed stage fitted inside the viewport, while export frames remain at the requested resolution.
 - The start module, linked modules, and downstream modules follow the requested cause-and-effect order.

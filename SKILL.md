@@ -72,9 +72,12 @@ Before the static visual gate, preserve Figma layout metadata for text-bearing a
 
 - Create `output/<demo-slug>/layout-provenance.json` for visible text frames, headings, counters, badges, pills, chips, buttons, composer controls, list rows, and auto-layout groups whose spacing matters. Include page location, Figma node id, role, absolute bounds, parent bounds, x/y position, width/height, padding, gap, item sizing mode, child bounds, overflow policy, and implementation selector.
 - Preserve explicit Figma x/y coordinates and frame width/height for separate text nodes. Do not merge adjacent text nodes into one flex row when Figma positions them independently.
-- Browser font metrics may be wider or narrower than Figma. Keep the Figma text frame's position and width fixed; use the source font, outlined text, `overflow: hidden`, clipping, or ellipsis according to the Figma design rather than letting text push neighboring elements.
+- Browser font metrics may be wider or narrower than Figma. Keep the Figma text frame's position and width fixed; prefer the exact source font or Figma-exported text outlines. If editable or typewriter text is required, fit text inside an anchored inner wrapper without moving the frame or sibling nodes.
+- Do not use `overflow: hidden` as a generic text-fitting fix. Use clipping, hidden overflow, or ellipsis only when the Figma node itself has clipping, masking, ellipsis, or equivalent constrained text behavior.
+- Text fitting must not move, resize, or overlap sibling nodes. Icons, chevrons, dropdown arrows, counters, badges, and labels must use their own Figma bounds, not coordinates inferred from neighboring text.
+- For any text plus icon/control pair in the same Figma frame, record both the rendered text bounds and sibling icon/control bounds in `layout-provenance.json`; browser geometry must show no intersection unless the Figma source overlaps them.
 - For pills, chips, badges, and buttons, preserve total component width, left/right padding, icon/text child bounds, and gaps from Figma metadata. Do not let flex content naturally squeeze, expand, or re-center children unless the Figma node uses that sizing behavior.
-- Run `node scripts/check_layout_provenance.js --provenance output/<demo-slug>/layout-provenance.json` before visual review. The check must fail on missing bounds, missing implementation selectors, text-like rows without locked text bounds, auto-layout rows without padding/gap/item sizing, or component rows without overflow policy.
+- Run `node scripts/check_layout_provenance.js --provenance output/<demo-slug>/layout-provenance.json` before visual review. The check must fail on missing bounds, missing implementation selectors, text-like rows without locked text bounds, generic hidden overflow, text/sibling overlap, auto-layout rows without padding/gap/item sizing, or component rows without overflow policy.
 - If the target node has no text-bearing or auto-layout regions, write a single row with `notApplicableReason` instead of inventing empty placeholder entries.
 - Inspect focused crops for text-bearing headers, counters, pills, chips, and controls; full-page screenshots are not enough to approve spacing-sensitive typography.
 
@@ -85,6 +88,7 @@ Before the visual fidelity gate, the static HTML must prove 1:1 restoration with
 - Produce `icon-provenance.json`, `layer-provenance.json`, `layout-provenance.json`, and focused review crops for icon-dense, layer-dense, and spacing-sensitive regions.
 - Run `scripts/check_icon_fidelity.js`, `scripts/check_layer_provenance.js`, and `scripts/check_layout_provenance.js`; any failure blocks preview approval.
 - Any approximation, missing Figma node id, missing local asset, missing bounds, missing overlay/mask/opacity layer, missing overflow policy, or unreviewed shared-selector regression blocks the visual gate.
+- Spacing-sensitive text groups must pass browser geometry review: rendered text remains within its Figma frame policy, sibling icon/control bounds stay independently positioned, and unintended clipping, overflow, or overlap blocks approval.
 - Do not ask for visual approval from a full-page screenshot alone when local crops are required by the gates above.
 
 ## Start By Asking

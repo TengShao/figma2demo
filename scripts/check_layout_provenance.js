@@ -17,7 +17,7 @@ function usage() {
     "",
     "Rows must include:",
     "  pageLocation, figmaNodeId, role, bounds, implementationSelector, overflowPolicy",
-    "Text rows also need textBoundsLocked=true.",
+    "Text rows also need textBoundsLocked=true, textFitMethod, and renderedTextBounds.",
     "Auto-layout/component rows also need padding, gap, itemSizing, and childBounds.",
     "If the page has no text-bearing or auto-layout regions, use [{\"notApplicableReason\":\"...\"}].",
   ].join("\n");
@@ -35,6 +35,19 @@ function hasChildBounds(childBounds) {
   return Array.isArray(childBounds) && childBounds.length > 0 && childBounds.every((child) => {
     return child && child.name && hasBounds(child.bounds);
   });
+}
+
+function hasSiblingBounds(siblingBounds) {
+  return Array.isArray(siblingBounds) && siblingBounds.every((sibling) => {
+    return sibling && sibling.name && hasBounds(sibling.bounds);
+  });
+}
+
+function intersects(a, b) {
+  return a.x < b.x + b.width
+    && a.x + a.width > b.x
+    && a.y < b.y + b.height
+    && a.y + a.height > b.y;
 }
 
 function validate(rows) {
@@ -61,8 +74,39 @@ function validate(rows) {
     }
 
     const role = String(row.role || "").toLowerCase();
-    if (textRoles.has(role) && row.textBoundsLocked !== true) {
-      issues.push(`layout[${index}]: text-like rows must set textBoundsLocked=true`);
+    const isText = textRoles.has(role);
+    if (isText) {
+      if (row.textBoundsLocked !== true) {
+        issues.push(`layout[${index}]: text-like rows must set textBoundsLocked=true`);
+      }
+      if (!row.textFitMethod) {
+        issues.push(`layout[${index}]: text-like rows must include textFitMethod`);
+      }
+      if (!hasBounds(row.renderedTextBounds)) {
+        issues.push(`layout[${index}]: text-like rows must include renderedTextBounds from browser geometry`);
+      }
+      if (String(row.textFitMethod).toLowerCase() === "generic-overflow-hidden") {
+        issues.push(`layout[${index}]: textFitMethod must not be generic-overflow-hidden`);
+      }
+      if (String(row.overflowPolicy).toLowerCase() === "hidden"
+        && row.figmaClipping !== true
+        && row.figmaEllipsis !== true
+        && row.figmaMask !== true) {
+        issues.push(`layout[${index}]: overflowPolicy=hidden requires figmaClipping, figmaEllipsis, or figmaMask`);
+      }
+      if (row.textFitAffectsSiblings === true) {
+        issues.push(`layout[${index}]: text fitting must not move or resize sibling nodes`);
+      }
+      if (row.hasSiblingControls === true && !hasSiblingBounds(row.siblingBounds)) {
+        issues.push(`layout[${index}]: text/control pairs must include siblingBounds`);
+      }
+      if (hasBounds(row.renderedTextBounds) && hasSiblingBounds(row.siblingBounds)) {
+        for (const sibling of row.siblingBounds) {
+          if (intersects(row.renderedTextBounds, sibling.bounds) && row.figmaOverlap !== true) {
+            issues.push(`layout[${index}]: rendered text overlaps sibling ${sibling.name}`);
+          }
+        }
+      }
     }
 
     if (componentRoles.has(role)) {
