@@ -34,6 +34,16 @@ Library maintenance mode does not require Figma MCP unless the user asks to vali
 - If outlined text would conflict with requested editable or typewriter text, stop and ask the user whether to provide the font file, accept a fallback font, or keep the exact outline without text animation.
 - Do not simplify detailed Figma artwork into CSS approximations unless the user explicitly approves that tradeoff.
 
+## Icon And Vector Asset Gate
+
+Before writing or previewing the static HTML, make an asset inventory for every icon-like layer, logo, vector mark, chart glyph, and custom illustration visible in the target Figma node:
+
+- Record the Figma layer name or id, intended local asset path, export format, and where it appears in the demo.
+- Export or download each listed item from Figma into the demo-local `assets/` folder before using it in HTML/CSS.
+- If any listed item cannot be exported, stop and tell the user which Figma layer is blocked. Do not substitute CSS, emoji, icon fonts, lucide icons, or approximate library icons unless the user explicitly accepts a non-1:1 fallback for that specific layer.
+- Use CSS only for layout, masks, sizing, opacity, and animation of exported assets; do not draw the source icon shape with borders, pseudo-elements, gradients, or hand-coded SVG.
+- During visual review, compare icon identity as part of fidelity, not just position and size.
+
 ## Start By Asking
 
 If the user asks to add, modify, improve, rename, remove, or review a template, effect pack, or parameter, enter **Library maintenance mode** instead of demo production mode.
@@ -105,6 +115,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 
 1. **Visual fidelity gate**
    - After reading Figma and generating the static HTML replica, show or open the HTML preview for the user.
+   - Confirm that all icon-like layers and vector marks are real exported assets from the Figma source, not approximations.
    - Ask the user to confirm whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
    - Do not start animation work until the user confirms the visual restoration.
@@ -129,7 +140,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Use Figma MCP tools to get metadata, design context, screenshots, and asset URLs.
    - Treat failed MCP access as a blocker for 1:1 restoration unless the user explicitly approves a non-Figma fallback.
    - Treat Figma layer positions, sizes, text, colors, borders, radii, shadows, and image assets as the source of truth.
-   - Export or download the exact icons, logos, vector marks, bitmap assets, and outlined special-font text from Figma. Do not replace them with CSS approximations or approximate icon-library icons.
+   - Complete the Icon And Vector Asset Gate. Export or download the exact icons, logos, vector marks, bitmap assets, and outlined special-font text from Figma. Do not replace them with CSS approximations or approximate icon-library icons.
 
 2. **Rebuild a 1:1 static HTML stage**
    - Use the requested or template-defined stage size, defaulting to 1920x1080.
@@ -143,6 +154,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 3. **Preview and confirm visual fidelity**
    - Show the static HTML preview before adding animation.
    - Confirm the preview viewport fits the full fixed stage without cropping, browser-level horizontal scroll, or raw 1920px overflow.
+   - Confirm that every visible icon-like layer matches the Figma source asset; icon mismatches are fidelity failures, not acceptable approximations.
    - Invite visual diff comments only at this gate: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
    - Stop and wait for explicit user confirmation before continuing to animation.
