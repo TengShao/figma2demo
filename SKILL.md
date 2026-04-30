@@ -75,6 +75,15 @@ Before the static visual gate, preserve Figma layout metadata for text-bearing a
 - Run `node scripts/check_layout_provenance.js --provenance output/<demo-slug>/layout-provenance.json` before visual review. The check must fail on missing bounds, missing implementation selectors, text-like rows without locked text bounds, auto-layout rows without padding/gap/item sizing, or component rows without overflow policy.
 - Inspect focused crops for text-bearing headers, counters, pills, chips, and controls; full-page screenshots are not enough to approve spacing-sensitive typography.
 
+## Static Fidelity Enforcement
+
+Before the visual fidelity gate, the static HTML must prove 1:1 restoration with artifacts, not claims:
+
+- Produce `icon-provenance.json`, `layer-provenance.json`, `layout-provenance.json`, and focused review crops for icon-dense, layer-dense, and spacing-sensitive regions.
+- Run `scripts/check_icon_fidelity.js`, `scripts/check_layer_provenance.js`, and `scripts/check_layout_provenance.js`; any failure blocks preview approval.
+- Any approximation, missing Figma node id, missing local asset, missing bounds, missing overlay/mask/opacity layer, missing overflow policy, or unreviewed shared-selector regression blocks the visual gate.
+- Do not ask for visual approval from a full-page screenshot alone when local crops are required by the gates above.
+
 ## Start By Asking
 
 If the user asks to add, modify, improve, rename, remove, or review a template, effect pack, or parameter, enter **Library maintenance mode** instead of demo production mode.
@@ -150,6 +159,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 
 1. **Visual fidelity gate**
    - After reading Figma and generating the static HTML replica, show or open the HTML preview for the user.
+   - Complete Static Fidelity Enforcement before asking for approval.
    - Confirm that all icon-like layers and vector marks passed the Icon And Vector Asset Gate with provenance tied to actual Figma instance node ids.
    - Confirm that complex regions passed the Instance Context And Layer Tree Gate, including overlays, masks, opacity layers, and stacking order.
    - Confirm that text-bearing and auto-layout regions passed the Bounds And Text Layout Gate, including fixed text frames, padding, gaps, overflow, and child bounds.

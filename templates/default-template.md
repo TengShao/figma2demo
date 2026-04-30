@@ -77,6 +77,7 @@ Start from the module named by the user. If the flow starts in a composer, type 
 ## Acceptance Checks
 
 - Visual restoration matches the source Figma before animation begins.
+- Static fidelity is proven with provenance artifacts, passing checks, and required focused crops before visual approval is requested.
 - `scripts/check_icon_fidelity.js` passes against the HTML and `icon-provenance.json` before the visual gate.
 - `scripts/check_layer_provenance.js` passes against `layer-provenance.json` before the visual gate, and the file accounts for all overlay, mask, opacity, fill, blend, and z-order layers in complex regions.
 - `scripts/check_layout_provenance.js` passes against `layout-provenance.json` before the visual gate, and spacing-sensitive text, counters, pills, chips, badges, controls, and auto-layout groups preserve Figma bounds, padding, gaps, child bounds, and overflow policy.
