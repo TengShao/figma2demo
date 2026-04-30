@@ -2,7 +2,7 @@
 
 Language: [English](#english) | [中文](#中文)
 
-## English
+<a id="english"></a>
 
 Figma2Demo is a Codex skill for turning Figma designs into reviewed, faithful animated HTML demos and MP4 videos.
 
@@ -96,7 +96,9 @@ Parameters:
 
 - `agentic-workflow-rhythm`: request/context/retrieval/service/synthesis timing rhythm.
 
-## 中文
+---
+
+<a id="中文"></a>
 
 Figma2Demo 是一个 Codex 技能，用来把 Figma 设计稿还原成可审阅的动画 HTML 演示，并导出 MP4 视频。
 
