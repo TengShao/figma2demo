@@ -1,6 +1,8 @@
 # Figma2Demo
 
-Language: [English](#english) | [中文](#中文)
+---
+
+[English](#english) | [中文](#中文)
 
 <a id="english"></a>
 
