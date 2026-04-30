@@ -1,9 +1,9 @@
 {
   "templates": [
     {
-      "id": "ugc-agent",
+      "id": "agent-workspace",
       "title": "Agent Workspace Demo",
-      "file": "templates/ugc-agent.md",
+      "file": "templates/agent-workspace.md",
       "summary": "A reviewed product-operation demo pattern for agent workspaces with staged upload, search, service, and analysis modules.",
       "tags": ["agent", "workspace", "management-demo"],
       "parameters": ["agentic-workflow-rhythm"],

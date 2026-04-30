@@ -1,4 +1,4 @@
-# Template: ugc-agent
+# Template: agent-workspace
 
 Use this template for management-ready product demos that show an agent-style workspace receiving a user request, attaching context files, consulting knowledge or services, and revealing analysis modules in a staged sequence.
 
@@ -35,7 +35,7 @@ Start from the module named by the user. If the flow starts in a composer, type 
 | request | composer or start module | type/reveal, then send or activate | user bubble, file chips | short confirmation hold |
 | context | uploaded files or left knowledge sections | staggered fade/slide | matching file chips | brief reading pause |
 | retrieval | search, database, or best-practice panel | reveal with count/result state | named database/source indicator | result hold |
-| service | service or competitor-analysis panel | reveal after retrieval | named service indicator | short processing pause |
+| service | service result or external analysis panel | reveal after retrieval | named service indicator | short processing pause |
 | synthesis | central or right analysis module | type/reveal generated answer and final panels | supporting evidence modules | final management hold |
 
 ## Special Logic
@@ -44,8 +44,8 @@ Start from the module named by the user. If the flow starts in a composer, type 
 - If the center workspace begins focused, keep it centered at first. After the trigger is sent, move it to its final position and reveal downstream analysis or search areas.
 - Hide downstream modules until their trigger occurs.
 - Coordinate linked modules by timing rather than proximity alone. Examples:
-  - `UGC白皮书 Database` appears with the `最佳实践` panel or search count.
-  - `竞品分析 Service` appears with the `竞品分析` panel.
+  - A knowledge-base source indicator appears with the related search result, best-practice panel, or evidence count.
+  - A service connector appears with the related service result or analysis panel.
   - Left sidebar knowledge sections appear in sync with corresponding uploaded file chips.
 - If the user says one module appears only after another finishes, include an actual delay after the preceding animation completes.
 
