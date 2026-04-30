@@ -31,6 +31,7 @@ Library maintenance mode does not require Figma MCP unless the user asks to vali
 - Restore the Figma design 1:1. Layer position, size, typography, colors, borders, radii, shadows, opacity, blur, images, masks, and interaction states are all source-of-truth details.
 - Icons and logo-like vector marks must be exported from Figma as real vector assets, preferably whole-node SVG, and referenced from the demo-local `assets/` folder. Do not recreate icons with CSS boxes, pseudo-elements, emoji, icon fonts, approximate icon libraries, or manually reassembled child vectors.
 - Do not collapse the Figma layer tree into only the largest visible objects. Opacity layers, overlay fills, masks, blend modes, clipping groups, and stacking order are source-of-truth details.
+- Do not let browser natural text width, flex shrink/grow, or content-driven sizing override Figma metadata. Text frames, counters, pills, chips, badges, controls, and auto-layout children must preserve Figma bounds, spacing, padding, and item sizing.
 - If a design uses a special font that is not available locally and cannot be bundled for the demo, convert the affected text to vector outlines from Figma and use those outlines for visual fidelity.
 - If outlined text would conflict with requested editable or typewriter text, stop and ask the user whether to provide the font file, accept a fallback font, or keep the exact outline without text animation.
 - Do not simplify detailed Figma artwork into CSS approximations unless the user explicitly approves that tradeoff.
@@ -62,6 +63,17 @@ Before the static visual gate, preserve instance context and child-layer structu
 - Implement transparent overlays, masks, blend layers, clipping groups, and fill rectangles explicitly. Do not assume they are part of the underlying image unless the exported Figma node already includes them.
 - Preserve stacking order inside complex regions: background/image, overlay or mask layers, foreground pills/cards, text, and icons must follow the Figma layer tree.
 - If a shared class, selector, or asset is modified after preview, enumerate every page location that uses it and re-check focused crops for all of those locations before asking for visual approval again.
+
+## Bounds And Text Layout Gate
+
+Before the static visual gate, preserve Figma layout metadata for text-bearing and auto-layout regions:
+
+- Create `output/<demo-slug>/layout-provenance.json` for visible text frames, headings, counters, badges, pills, chips, buttons, composer controls, list rows, and auto-layout groups whose spacing matters. Include page location, Figma node id, role, absolute bounds, parent bounds, x/y position, width/height, padding, gap, item sizing mode, child bounds, overflow policy, and implementation selector.
+- Preserve explicit Figma x/y coordinates and frame width/height for separate text nodes. Do not merge adjacent text nodes into one flex row when Figma positions them independently.
+- Browser font metrics may be wider or narrower than Figma. Keep the Figma text frame's position and width fixed; use the source font, outlined text, `overflow: hidden`, clipping, or ellipsis according to the Figma design rather than letting text push neighboring elements.
+- For pills, chips, badges, and buttons, preserve total component width, left/right padding, icon/text child bounds, and gaps from Figma metadata. Do not let flex content naturally squeeze, expand, or re-center children unless the Figma node uses that sizing behavior.
+- Run `node scripts/check_layout_provenance.js --provenance output/<demo-slug>/layout-provenance.json` before visual review. The check must fail on missing bounds, missing implementation selectors, text-like rows without locked text bounds, auto-layout rows without padding/gap/item sizing, or component rows without overflow policy.
+- Inspect focused crops for text-bearing headers, counters, pills, chips, and controls; full-page screenshots are not enough to approve spacing-sensitive typography.
 
 ## Start By Asking
 
@@ -111,6 +123,7 @@ output/<demo-slug>/
   <demo-slug>.mp4
   icon-provenance.json
   layer-provenance.json
+  layout-provenance.json
   review-crops/
   assets/
 scratch/<demo-slug>/
@@ -139,6 +152,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - After reading Figma and generating the static HTML replica, show or open the HTML preview for the user.
    - Confirm that all icon-like layers and vector marks passed the Icon And Vector Asset Gate with provenance tied to actual Figma instance node ids.
    - Confirm that complex regions passed the Instance Context And Layer Tree Gate, including overlays, masks, opacity layers, and stacking order.
+   - Confirm that text-bearing and auto-layout regions passed the Bounds And Text Layout Gate, including fixed text frames, padding, gaps, overflow, and child bounds.
    - Ask the user to confirm whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
    - Do not start animation work until the user confirms the visual restoration.
@@ -165,6 +179,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Treat Figma layer positions, sizes, text, colors, borders, radii, shadows, and image assets as the source of truth.
    - Complete the Icon And Vector Asset Gate. Export or download the exact icons, logos, vector marks, bitmap assets, and outlined special-font text from Figma. Do not replace them with CSS approximations or approximate icon-library icons.
    - Complete the Instance Context And Layer Tree Gate for repeated components and complex regions.
+   - Complete the Bounds And Text Layout Gate for text-bearing and auto-layout regions.
 
 2. **Rebuild a 1:1 static HTML stage**
    - Use the requested or template-defined stage size, defaulting to 1920x1080.
@@ -174,6 +189,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Use exported vector assets for icon-like layers; never draw them with CSS for convenience.
    - Keep assets in the demo-local `assets/` folder and reference them directly.
    - Preserve complex-region child layers and z-order from `layer-provenance.json`.
+   - Preserve text, pill, chip, badge, counter, control, and auto-layout bounds from `layout-provenance.json`.
    - Build the actual interface as the first screen. Do not add marketing copy, extra slogans, or explanatory UI unless requested.
 
 3. **Preview and confirm visual fidelity**
@@ -182,6 +198,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Confirm that every visible icon-like layer matches the Figma source asset; icon mismatches are fidelity failures, not acceptable approximations.
    - For directional or transformed icons, verify orientation, stroke/weight, visual inset, and rendered bounds against Figma; do not accept icons that only have the right general shape.
    - Inspect focused crops for icon-dense and layer-dense regions, not only the full-page screenshot.
+   - Inspect focused crops for spacing-sensitive text groups, counters, pills, chips, and controls where font metrics or flex sizing could alter the layout.
    - After changes to any shared selector, shared asset, or reused component, inspect focused crops for every affected instance before re-requesting approval.
    - Invite visual diff comments only at this gate: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
