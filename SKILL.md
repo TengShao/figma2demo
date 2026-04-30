@@ -112,11 +112,12 @@ Read `catalog.json` before choosing a template or effect pack.
 - If the user did not specify a template id, show the available `templates[]` entries from `catalog.json` and stop for selection.
 - After a template is selected, read the template file listed in `catalog.json`.
 - Silently load any parameters listed by the template's catalog entry. Parameters are not ordinary user-facing choices.
+- Silently load any `defaultEffects` listed by the template's catalog entry. Default effects are part of the template's baseline animation grammar and do not require separate user selection.
 - If the user asks for effect packs, read only the selected files from `effects[]`.
 - If the user asks what effect packs are available, show the `effects[]` entries from `catalog.json`.
-- Do not auto-enable effect packs when the user has not selected them.
+- Do not auto-enable non-default effect packs when the user has not selected them.
 
-Use `touchedAreas` and `conflictsWith` from `catalog.json` to detect conflicts among the template, selected effects, and loaded parameters. If any selected items conflict, stop and ask the user to decide for this run. Do not write that decision back to the template library unless explicitly asked.
+Use `touchedAreas` and `conflictsWith` from `catalog.json` to detect conflicts among the template, selected effects, template default effects, and loaded parameters. If any selected items conflict, stop and ask the user to decide for this run. Do not write that decision back to the template library unless explicitly asked.
 
 ## Library Maintenance Mode
 

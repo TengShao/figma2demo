@@ -43,6 +43,19 @@ After visual approval, recommend an animation start module and linked-module gro
 | service | service result or external analysis panel | reveal after retrieval | named service indicator | short processing pause |
 | synthesis | central or right analysis module | type/reveal generated answer and final panels | supporting evidence modules | final management hold |
 
+## Default Motion Grammar
+
+Use this motion grammar when the approved static screen contains a central workspace/composer and downstream left or right modules that should appear as a consequence of the request.
+
+- Build the animation around named stage groups, not unrelated per-card animations: `workspaceGroup`, `composerGroup`, `leftContextGroup`, `rightResultGroup`, and optional `moduleChrome`.
+- If the right or downstream result area is hidden at the start, keep the active workspace visually centered by translating the workspace background, main content, and composer together. Compute the offset from the final Figma layout so the centered start state still preserves internal layer geometry.
+- Keep static navigation rails, global chrome, and unrelated frame background anchored unless the Figma design implies they are part of the moving workspace.
+- After the send or activation beat, hold briefly, then animate the grouped workspace from the centered start offset back to its Figma-final position while revealing downstream modules. The old UGC-agent reference used this pattern: workspace and composer held at `translateX(274px)` until about 42% of a 13s timeline, then returned to `translateX(0)` by about 49%.
+- Reveal the right result group at the same trigger as the workspace return, using a short fade plus 6-10px upward motion. Do not show right-side result cards before this trigger unless they are already part of the initial Figma state and the user approves it.
+- Reveal left context modules as subparts, not a single block: section background first, then title or expander, then document row, then file chip. Stagger sibling sections by roughly 120-300ms so the source gathering reads as active work.
+- Use one shared timeline table or CSS variable block for major beats such as `sendAt`, `contextAt`, `workspaceShiftAt`, `rightRevealAt`, `retrievalAt`, `serviceAt`, and `synthesisAt`. Per-element classes may consume those times, but the source of timing should be patchable in one place.
+- Keep the final frame equal to the approved Figma-restored layout: all moved groups end at the exact static coordinates, with no residual transform drift.
+
 ## Special Logic
 
 - File chips that simulate uploads should appear after the first sent request and align visually with that user action.
@@ -56,8 +69,12 @@ After visual approval, recommend an animation start module and linked-module gro
 
 ## Effect Pack Guidance
 
+- This template's default effects are `typewriter`, `cursor-send`, `fade-up-reveal`, `staggered-module-reveal`, and `click-ring-pulse`. Load them automatically from `catalog.json` unless the user explicitly disables one for the run.
+- Use `fade-up-reveal` for downstream module shells, right-side result groups, count labels, media tiles, and document rows that enter after the workflow trigger.
+- Use `staggered-module-reveal` when a card, sidebar section, or result module should appear as active work rather than as one block.
 - Use `typewriter` when generated answers or long user-visible generated text should appear character by character.
 - Use `cursor-send` when the demo shows the user typing, clicking send, or activating the composer.
+- Use `click-ring-pulse` with `cursor-send` when the cursor activates a send button or primary action.
 - Avoid applying typewriter behavior to rows, menu items, pills, or file chips that should appear as complete objects.
 
 ## Export Defaults

@@ -7,6 +7,7 @@
       "summary": "A reviewed product-operation demo pattern for agent workspaces with staged upload, search, service, and analysis modules.",
       "tags": ["agent", "workspace", "management-demo"],
       "parameters": ["agentic-workflow-rhythm"],
+      "defaultEffects": ["typewriter", "cursor-send", "fade-up-reveal", "staggered-module-reveal", "click-ring-pulse"],
       "touchedAreas": ["timeline", "linked-modules", "workspace-layout", "export-defaults"],
       "conflictsWith": [],
       "defaults": {
@@ -29,13 +30,41 @@
       "conflictsWith": ["sweep-text-reveal"]
     },
     {
+      "id": "fade-up-reveal",
+      "title": "Fade Up Reveal",
+      "file": "effects/fade-up-reveal.md",
+      "summary": "Reveal modules or child layers with a short deterministic opacity and upward-motion entrance.",
+      "tags": ["reveal", "fade", "module", "motion"],
+      "touchedAreas": ["module-reveal", "timeline"],
+      "conflictsWith": ["instant-all-modules", "hard-cut-reveal"]
+    },
+    {
+      "id": "staggered-module-reveal",
+      "title": "Staggered Module Reveal",
+      "file": "effects/staggered-module-reveal.md",
+      "summary": "Reveal a module's internal layers in semantic order, such as shell, header, count, rows, chips, and media.",
+      "tags": ["stagger", "module", "layers", "cards"],
+      "touchedAreas": ["module-reveal", "layer-order", "timeline"],
+      "conflictsWith": ["instant-all-modules", "single-block-reveal"]
+    },
+    {
       "id": "cursor-send",
       "title": "Cursor Send Interaction",
       "file": "effects/cursor-send.md",
       "summary": "Animate a cursor through input, send, and post-send cleanup behavior.",
       "tags": ["cursor", "input", "send"],
+      "assets": ["assets/cursor-pointer.svg"],
       "touchedAreas": ["cursor", "composer", "send-action", "timeline"],
       "conflictsWith": ["static-cursor", "auto-hide-composer"]
+    },
+    {
+      "id": "click-ring-pulse",
+      "title": "Click Ring Pulse",
+      "file": "effects/click-ring-pulse.md",
+      "summary": "Show a deterministic expanding ring and optional button pulse at an activation point.",
+      "tags": ["click", "pulse", "cursor", "activation"],
+      "touchedAreas": ["cursor", "send-action", "timeline"],
+      "conflictsWith": ["no-click-feedback", "static-cursor"]
     }
   ],
   "parameters": [

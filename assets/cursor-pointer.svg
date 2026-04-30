@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="cursor-body" x1="116" y1="88" x2="335" y2="388" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#737373"/>
+      <stop offset="0.18" stop-color="#1e1e1e"/>
+      <stop offset="0.62" stop-color="#030303"/>
+      <stop offset="1" stop-color="#111111"/>
+    </linearGradient>
+    <linearGradient id="cursor-top-plane" x1="112" y1="78" x2="342" y2="262" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f6f6f6" stop-opacity="0.74"/>
+      <stop offset="0.2" stop-color="#b4b4b4" stop-opacity="0.46"/>
+      <stop offset="0.58" stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cursor-axis-ridge" x1="86" y1="82" x2="304" y2="297" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.82"/>
+      <stop offset="0.28" stop-color="#ffffff" stop-opacity="0.34"/>
+      <stop offset="0.72" stop-color="#000000" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#000000" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cursor-edge" x1="98" y1="67" x2="393" y2="386" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f1f1f1" stop-opacity="0.72"/>
+      <stop offset="0.23" stop-color="#8d8d8d" stop-opacity="0.42"/>
+      <stop offset="0.58" stop-color="#000000" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#b8b8b8" stop-opacity="0.34"/>
+    </linearGradient>
+    <filter id="cursor-shadow" x="51" y="55" width="412" height="413" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000000" flood-opacity="0.42"/>
+    </filter>
+    <filter id="cursor-soft-highlight" x="77" y="64" width="360" height="253" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="2.8"/>
+    </filter>
+  </defs>
+  <g filter="url(#cursor-shadow)">
+    <path d="M105.4 75.5C88.5 63.8 67.1 80.9 74.2 100.1L208.9 435.9C216.1 455.3 243.1 456.8 252.5 438.4L318.9 308.7C322.9 301 330.1 295.4 338.6 293.6L430.9 273.3C451.3 268.8 456.2 242.1 438.9 230.4L105.4 75.5Z" fill="url(#cursor-body)"/>
+    <path d="M105.4 75.5C88.5 63.8 67.1 80.9 74.2 100.1L208.9 435.9C216.1 455.3 243.1 456.8 252.5 438.4L318.9 308.7C322.9 301 330.1 295.4 338.6 293.6L430.9 273.3C451.3 268.8 456.2 242.1 438.9 230.4L105.4 75.5Z" stroke="url(#cursor-edge)" stroke-width="2.5"/>
+    <path d="M94.2 84.4L409.7 233.8C426.9 241.9 423.2 266.8 404.7 270.8L337.5 285.6C321.5 289.1 306.9 297.4 295.8 309.3L94.2 84.4Z" fill="url(#cursor-top-plane)" filter="url(#cursor-soft-highlight)"/>
+    <path d="M92.5 84.8C155.4 132.9 225.1 205.1 296.4 307.6" stroke="url(#cursor-axis-ridge)" stroke-width="5.2" stroke-linecap="round" opacity="0.54"/>
+    <path d="M122.5 98.6L383.6 228.3C397.7 235.3 396.3 255.8 381 259.4L331.8 270.8C314.6 274.8 298.5 283.1 285.4 295L122.5 98.6Z" fill="white" opacity="0.055"/>
+  </g>
+</svg>

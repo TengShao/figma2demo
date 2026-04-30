@@ -21,13 +21,13 @@ Then create a demo with:
 ```text
 Use $figma2demo to create a demo named "Agent Workflow Review" from this Figma link.
 Template: default-template.
-Use typewriter and cursor-send effects.
+The template will load its default effects automatically: typewriter, cursor-send, fade-up-reveal, staggered-module-reveal, and click-ring-pulse.
 After visual approval, recommend the animation start point and linked modules before asking me to confirm.
 ```
 
 ### Agent Adapters
 
-Adapters are onboarding guides. Read the matching adapter before installation; the installed runtime skill only needs `SKILL.md`, `catalog.json`, `templates/`, `effects/`, `parameters/`, `references/`, and `scripts/`.
+Adapters are onboarding guides. Read the matching adapter before installation; the installed runtime skill only needs `SKILL.md`, `catalog.json`, `templates/`, `effects/`, `parameters/`, `references/`, `scripts/`, and `assets/`.
 
 | Agent | Adapter | Entry |
 | --- | --- | --- |
@@ -65,6 +65,7 @@ effects/                  Optional animation effect packs
 parameters/               Template-only parameters
 references/               Maintenance and export references
 scripts/                  Frame capture and MP4 helpers
+assets/                   Shared runtime assets such as the default cursor
 agents/openai.yaml        Codex UI metadata
 ```
 
@@ -98,13 +99,13 @@ Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agen
 ```text
 使用 $figma2demo 基于这个 Figma 链接创建一个名为“Agent Workflow Review”的演示。
 模板：default-template。
-使用 typewriter 和 cursor-send 特效包。
+模板会自动加载默认特效：typewriter、cursor-send、fade-up-reveal、staggered-module-reveal 和 click-ring-pulse。
 视觉确认后，先建议动画起点和联动模块，再让我确认。
 ```
 
 ### Agent 适配
 
-`adapters/` 是接入说明，不是运行时依赖。安装前读取对应 adapter；最终安装的技能目录只需要 `SKILL.md`、`catalog.json`、`templates/`、`effects/`、`parameters/`、`references/` 和 `scripts/`。
+`adapters/` 是接入说明，不是运行时依赖。安装前读取对应 adapter；最终安装的技能目录只需要 `SKILL.md`、`catalog.json`、`templates/`、`effects/`、`parameters/`、`references/`、`scripts/` 和 `assets/`。
 
 | Agent | 适配文件 | 入口 |
 | --- | --- | --- |
@@ -142,6 +143,7 @@ effects/                  可选动画特效包
 parameters/               模板参数
 references/               维护和导出细节
 scripts/                  帧捕获和 MP4 导出脚本
+assets/                   默认鼠标等共享运行时素材
 agents/openai.yaml        Codex 界面元数据
 ```
 
