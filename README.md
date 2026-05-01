@@ -39,12 +39,12 @@ Adapters are setup notes for different agent environments. They are not runtime 
 | Hermes / generic agents | `adapters/hermes.md` | `/figma2demo ...` |
 | OpenClaw | `adapters/openclaw.md` | `/figma2demo create <figma-url>` |
 
-### Output Paths
+### Workflow
 
 Everything starts from the same reviewed HTML foundation:
 
 ```text
-Figma -> reviewed 1:1 HTML restoration
+Figma -> reviewed HTML restoration
 ```
 
 Then choose one output, or generate both:
@@ -156,12 +156,12 @@ Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agen
 | Hermes / 通用 Agent | `adapters/hermes.md` | `/figma2demo ...` |
 | OpenClaw | `adapters/openclaw.md` | `/figma2demo create <figma-url>` |
 
-### 两种输出
+### 工作流
 
-两种输出都从同一个基础开始：
+两种工作流都从同一个基础开始：
 
 ```text
-Figma -> 已确认的 1:1 HTML 还原稿
+Figma -> 已确认的 HTML 还原稿
 ```
 
 之后可以只选一种，也可以两种都生成：
