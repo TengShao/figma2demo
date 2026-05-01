@@ -1,6 +1,6 @@
 # Export Reference
 
-Use this reference after the animation gate is approved and the user is ready to export an MP4.
+Use this reference after the Animation Review is approved and the user is ready to export an MP4.
 
 ## Output Structure
 

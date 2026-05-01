@@ -19,7 +19,7 @@ Do not support multiple frameworks in the MVP unless the user explicitly asks fo
 
 ## Trigger Points
 
-Offer Frontend Mode after the visual fidelity gate passes:
+Offer Frontend Mode after the Visual Fidelity Review is approved:
 
 ```text
 Visual fidelity is approved. What would you like to do next?

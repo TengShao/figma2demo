@@ -39,7 +39,7 @@ Frontend Mode does not require a new Figma read if it starts from an already app
 - If outlined text would conflict with requested editable or typewriter text, stop and ask the user whether to provide the font file, accept a fallback font, or keep the exact outline without text animation.
 - Do not simplify detailed Figma artwork into CSS approximations unless the user explicitly approves that tradeoff.
 
-## Icon And Vector Asset Gate
+## Icon And Vector Asset Review
 
 Before writing or previewing the static HTML, make an asset inventory for every icon-like layer, logo, vector mark, chart glyph, and custom illustration visible in the target Figma node:
 
@@ -51,27 +51,27 @@ Before writing or previewing the static HTML, make an asset inventory for every 
 - If whole-node export is unavailable but child vectors are available, only combine them when the original Figma geometry can be preserved exactly, including viewBox, dimensions, rendered bounds, fills, strokes, masks, nested groups, and transforms. Otherwise stop and tell the user which Figma layer is blocked.
 - Do not substitute CSS, emoji, icon fonts, lucide icons, approximate library icons, or manually reassembled child vectors unless the user explicitly accepts a non-1:1 fallback for that specific layer.
 - Use CSS only for layout, masks, sizing, opacity, and animation of exported assets; do not draw the source icon shape with borders, pseudo-elements, gradients, or hand-coded SVG.
-- Save the provenance table as `output/<demo-slug>/icon-provenance.json` before the visual fidelity gate. Missing provenance blocks the gate.
+- Save the provenance table as `output/<demo-slug>/icon-provenance.json` before the Visual Fidelity Review. Missing provenance blocks review approval.
 - If the target node has no icon-like or vector rows, write a single row with `notApplicableReason` instead of inventing empty placeholder entries.
 - Run `node scripts/check_icon_fidelity.js --html output/<demo-slug>/<demo-slug>.html --provenance output/<demo-slug>/icon-provenance.json` before visual review. The check must fail on inline SVG, CSS pseudo-element drawing, text/emoji/icon-font substitutions, lucide or other icon-library usage, missing exported asset paths, missing actual Figma node ids, non-whole-node exports without an explicit Figma-node fallback reason, or any manual-rebuild flag.
 - During visual review, compare icon identity as part of fidelity, not just position and size. Review icon crops or focused screenshots for dense icon areas such as navigation rails, arrows, service/database marks, composer controls, and right-side cards.
 
-## Instance Context And Layer Tree Gate
+## Instance Context And Layer Tree Review
 
-Before the static visual gate, preserve instance context and child-layer structure for repeated components and complex regions:
+Before the Visual Fidelity Review, preserve instance context and child-layer structure for repeated components and complex regions:
 
 - Treat every visible Figma instance as context-specific. Do not use a global selector or shared CSS transform to fix all same-named icons, arrows, chips, controls, or cards. Shared CSS may set neutral layout primitives, but instance-specific color, direction, scale, flip, inset, opacity, transform, and bounds must come from the actual Figma node export or an instance-scoped selector tied to provenance.
 - For complex regions such as cards, thumbnails, pills, chips, list rows, media previews, and right-side modules, create a child-layer inventory before coding. Include Figma node id, layer name, type, bounds, opacity, blend mode, mask/clipping state, fill/overlay role, z-order, and implementation selector or asset path.
-- Save that inventory as `output/<demo-slug>/layer-provenance.json`. Missing entries for visible overlay, mask, opacity, fill, or blend layers block the visual gate.
+- Save that inventory as `output/<demo-slug>/layer-provenance.json`. Missing entries for visible overlay, mask, opacity, fill, or blend layers block review approval.
 - If the target node has no complex regions, write a single row with `notApplicableReason` instead of inventing empty placeholder entries.
 - Run `node scripts/check_layer_provenance.js --provenance output/<demo-slug>/layer-provenance.json` before visual review. The check must fail on missing child-layer rows, missing bounds or z-order, unimplemented layers, or sensitive opacity/mask/blend/fill layers without an implementation selector or asset path.
 - Implement transparent overlays, masks, blend layers, clipping groups, and fill rectangles explicitly. Do not assume they are part of the underlying image unless the exported Figma node already includes them.
 - Preserve stacking order inside complex regions: background/image, overlay or mask layers, foreground pills/cards, text, and icons must follow the Figma layer tree.
 - If a shared class, selector, or asset is modified after preview, enumerate every page location that uses it and re-check focused crops for all of those locations before asking for visual approval again.
 
-## Bounds And Text Layout Gate
+## Bounds And Text Layout Review
 
-Before the static visual gate, preserve Figma layout metadata for text-bearing and auto-layout regions:
+Before the Visual Fidelity Review, preserve Figma layout metadata for text-bearing and auto-layout regions:
 
 - Create `output/<demo-slug>/layout-provenance.json` for visible text frames, headings, counters, badges, pills, chips, buttons, composer controls, list rows, and auto-layout groups whose spacing matters. Include page location, Figma node id, role, absolute bounds, parent bounds, x/y position, width/height, padding, gap, item sizing mode, child bounds, overflow policy, and implementation selector.
 - Preserve explicit Figma x/y coordinates and frame width/height for separate text nodes. Do not merge adjacent text nodes into one flex row when Figma positions them independently.
@@ -86,13 +86,13 @@ Before the static visual gate, preserve Figma layout metadata for text-bearing a
 
 ## Static Fidelity Enforcement
 
-Before the visual fidelity gate, the static HTML must prove 1:1 restoration with artifacts, not claims:
+Before the Visual Fidelity Review, the static HTML must prove 1:1 restoration with artifacts, not claims:
 
 - Produce `icon-provenance.json`, `layer-provenance.json`, `layout-provenance.json`, and focused review crops for icon-dense, layer-dense, and spacing-sensitive regions.
 - Run `scripts/check_icon_fidelity.js`, `scripts/check_layer_provenance.js`, and `scripts/check_layout_provenance.js`; any failure blocks preview approval.
-- Any approximation, missing Figma node id, missing local asset, missing bounds, missing overlay/mask/opacity layer, missing overflow policy, or unreviewed shared-selector regression blocks the visual gate.
+- Any approximation, missing Figma node id, missing local asset, missing bounds, missing overlay/mask/opacity layer, missing overflow policy, or unreviewed shared-selector regression blocks review approval.
 - Spacing-sensitive text groups must pass browser geometry review: rendered text remains within its Figma frame policy, sibling icon/control bounds stay independently positioned, and unintended clipping, overflow, or overlap blocks approval.
-- Do not ask for visual approval from a full-page screenshot alone when local crops are required by the gates above.
+- Do not ask for visual approval from a full-page screenshot alone when local crops are required by the reviews above.
 
 ## Start By Asking
 
@@ -177,28 +177,28 @@ Every generated demo HTML must separate the export stage from the browser previe
 
 ## Mandatory Flow Control
 
-This workflow has three required user-confirmation gates. Do not skip them, even if the user asks for the final MP4 in the first message, unless the user explicitly says to bypass review checkpoints.
+This workflow has three required user-confirmation checkpoints. Do not skip them, even if the user asks for the final MP4 in the first message, unless the user explicitly says to bypass review checkpoints.
 
-1. **Visual fidelity gate**
+1. **Visual Fidelity Review**
    - After reading Figma and generating the static HTML replica, show or open the HTML preview for the user.
    - Complete Static Fidelity Enforcement before asking for approval.
-   - Confirm that all icon-like layers and vector marks passed the Icon And Vector Asset Gate with provenance tied to actual Figma instance node ids.
-   - Confirm that complex regions passed the Instance Context And Layer Tree Gate, including overlays, masks, opacity layers, and stacking order.
-   - Confirm that text-bearing and auto-layout regions passed the Bounds And Text Layout Gate, including fixed text frames, padding, gaps, overflow, and child bounds.
+   - Confirm that all icon-like layers and vector marks passed the Icon And Vector Asset Review with provenance tied to actual Figma instance node ids.
+   - Confirm that complex regions passed the Instance Context And Layer Tree Review, including overlays, masks, opacity layers, and stacking order.
+   - Confirm that text-bearing and auto-layout regions passed the Bounds And Text Layout Review, including fixed text frames, padding, gaps, overflow, and child bounds.
    - Ask the user to confirm whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
    - Do not ask animation-start or linked-module questions, infer animation flow, or start animation work until the user confirms the visual restoration.
    - After explicit visual approval, offer Frontend Mode as an optional branch: continue animation/MP4, export a frontend starter project, or do both.
    - Stop and wait for explicit user confirmation before continuing to animation or generating frontend code.
 
-2. **Animation gate**
+2. **Animation Review**
    - After the user confirms the visual stage, implement the template-driven animation timeline and selected effect packs.
    - Preview the animated HTML for the user.
    - Ask the user to confirm whether timing, linkage, cursor behavior, text effects, and rhythm are acceptable.
    - If the user gives animation corrections, patch the timeline and preview again.
    - Do not export the MP4 until the user confirms the animation.
 
-3. **MP4 export gate**
+3. **MP4 Export Checkpoint**
    - After animation approval and before MP4 export, check whether this conversation introduced reusable special requirements that could improve the current template or become a new template.
    - If reusable requirements exist, ask whether the user wants to update the current template, create a new template, or keep the requirements only for this demo. If they choose to persist changes, read `references/maintenance.md`.
    - Only after this persistence check is resolved, capture and encode the final MP4.
@@ -212,9 +212,9 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Use Figma MCP tools to get metadata, design context, screenshots, and asset URLs.
    - Treat failed MCP access as a blocker for 1:1 restoration unless the user explicitly approves a non-Figma fallback.
    - Treat Figma layer positions, sizes, text, colors, borders, radii, shadows, and image assets as the source of truth.
-   - Complete the Icon And Vector Asset Gate. Export or download the exact icons, logos, vector marks, bitmap assets, and outlined special-font text from Figma. Do not replace them with CSS approximations or approximate icon-library icons.
-   - Complete the Instance Context And Layer Tree Gate for repeated components and complex regions.
-   - Complete the Bounds And Text Layout Gate for text-bearing and auto-layout regions.
+   - Complete the Icon And Vector Asset Review. Export or download the exact icons, logos, vector marks, bitmap assets, and outlined special-font text from Figma. Do not replace them with CSS approximations or approximate icon-library icons.
+   - Complete the Instance Context And Layer Tree Review for repeated components and complex regions.
+   - Complete the Bounds And Text Layout Review for text-bearing and auto-layout regions.
 
 2. **Rebuild a 1:1 static HTML stage**
    - Use the requested or template-defined stage size, defaulting to 1920x1080.
@@ -235,7 +235,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
    - Inspect focused crops for icon-dense and layer-dense regions, not only the full-page screenshot.
    - Inspect focused crops for spacing-sensitive text groups, counters, pills, chips, and controls where font metrics or flex sizing could alter the layout.
    - After changes to any shared selector, shared asset, or reused component, inspect focused crops for every affected instance before re-requesting approval.
-   - Invite visual diff comments only at this gate: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
+   - Invite visual diff comments only during the Visual Fidelity Review: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
    - After visual approval, offer the next branch: continue animation/MP4, export a Frontend Mode project, or do both.
    - If the user selects Frontend Mode, read `references/frontend-mode.md` and generate the standalone frontend project from the approved HTML and provenance artifacts.
@@ -258,7 +258,7 @@ This workflow has three required user-confirmation gates. Do not skip them, even
 
 5. **Preview and confirm animation before video export**
    - Show the animated HTML preview after the timeline is implemented.
-   - Invite animation comments at this gate: timing, sequencing, linked appearances, text effects, cursor behavior, motion direction, pauses, and total duration.
+   - Invite animation comments during the Animation Review: timing, sequencing, linked appearances, text effects, cursor behavior, motion direction, pauses, and total duration.
    - Address browser diff comments precisely.
    - After significant timing changes, inspect screenshots or browser frames at key timestamps.
    - Once animation is approved, perform the reusable requirement persistence check before exporting.
@@ -289,7 +289,7 @@ For guided library changes, read `references/maintenance.md`.
 
 ## Bundled Export Scripts
 
-Use the bundled scripts as the default MP4 export path after the animation gate is approved. Read `references/export.md` for the exact copy, capture, encode, and verification commands.
+Use the bundled scripts as the default MP4 export path after the Animation Review is approved. Read `references/export.md` for the exact copy, capture, encode, and verification commands.
 
 ## Quality Bar
 

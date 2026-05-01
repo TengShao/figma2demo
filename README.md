@@ -94,7 +94,7 @@ It also records provenance for icons, complex layers, and text/layout regions be
 
 ```text
 README.md                 Overview, install prompt, and agent trigger examples
-SKILL.md                  Core workflow, gates, and quality rules
+SKILL.md                  Core workflow, review checkpoints, and quality rules
 catalog.json              Template, effect, and parameter registry
 templates/                Reusable demo schemes and template scaffold
 effects/                  Animation effect packs and effect scaffold
