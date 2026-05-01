@@ -98,9 +98,9 @@ SKILL.md                  Core workflow, gates, and quality rules
 catalog.json              Template, effect, and parameter registry
 templates/                Reusable demo schemes and template scaffold
 effects/                  Animation effect packs and effect scaffold
-parameters/               Optional rules for customizing animation details, rhythm, and logic
-references/               Maintenance, frontend mode, and MP4 export references
-scripts/                  Provenance/fidelity checks, frame capture, and encoders
+parameters/               Rules for further customizing animation details, rhythm, and logic
+references/               Maintenance, frontend mode, and MP4 export details
+scripts/                  Visual fidelity checks, frame capture, and encoding scripts
 assets/                   Shared runtime assets, such as the default cursor
 adapters/                 Agent-specific onboarding notes, not runtime files
 agents/openai.yaml        Codex UI metadata
