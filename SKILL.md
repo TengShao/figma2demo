@@ -1,5 +1,6 @@
 ---
 name: figma2demo
+version: 0.1.0
 description: Convert Figma designs into faithful reviewed HTML demos, MP4 videos, and optional frontend starter projects using user-selected templates, optional effect packs, reusable parameters, staged animation review, and deterministic frame export.
 ---
 
