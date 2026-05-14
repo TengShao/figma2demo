@@ -1,6 +1,6 @@
 ---
 name: figma2demo
-version: 0.1.0
+version: 0.2.0
 description: Convert Figma designs into faithful reviewed HTML demos, MP4 videos, and optional frontend starter projects using user-selected templates, optional effect packs, reusable parameters, staged animation review, and deterministic frame export.
 ---
 
@@ -90,10 +90,19 @@ Before the Visual Fidelity Review, preserve Figma layout metadata for text-beari
 Before the Visual Fidelity Review, the static HTML must prove 1:1 restoration with artifacts, not claims:
 
 - Produce `icon-provenance.json`, `layer-provenance.json`, `layout-provenance.json`, and focused review crops for icon-dense, layer-dense, and spacing-sensitive regions.
-- Run `scripts/check_icon_fidelity.js`, `scripts/check_layer_provenance.js`, and `scripts/check_layout_provenance.js`; any failure blocks preview approval.
+- Run `node scripts/review_static.js --demo output/<demo-slug>` as the one-command static review gate. It wraps `scripts/check_icon_fidelity.js`, `scripts/check_layer_provenance.js`, `scripts/check_layout_provenance.js`, and verifies that focused review crops exist.
 - Any approximation, missing Figma node id, missing local asset, missing bounds, missing overlay/mask/opacity layer, missing overflow policy, or unreviewed shared-selector regression blocks review approval.
 - Spacing-sensitive text groups must pass browser geometry review: rendered text remains within its Figma frame policy, sibling icon/control bounds stay independently positioned, and unintended clipping, overflow, or overlap blocks approval.
 - Do not ask for visual approval from a full-page screenshot alone when local crops are required by the reviews above.
+
+## Standard User Prompts
+
+Use the bundled prompts so review checkpoints stay consistent across agents and adapters:
+
+- `prompts/visual-review.md`: ask for static visual approval after `scripts/review_static.js` passes.
+- `prompts/branch-selection.md`: ask whether to continue to animation/MP4, export Frontend Mode, or do both.
+- `prompts/animation-review.md`: ask for animation approval before MP4 export.
+- `prompts/template-persistence.md`: ask whether reusable animation requirements should update the template library before export.
 
 ## Start By Asking
 
@@ -182,26 +191,26 @@ This workflow has three required user-confirmation checkpoints. Do not skip them
 
 1. **Visual Fidelity Review**
    - After reading Figma and generating the static HTML replica, show or open the HTML preview for the user.
-   - Complete Static Fidelity Enforcement before asking for approval.
+   - Complete Static Fidelity Enforcement with `node scripts/review_static.js --demo output/<demo-slug>` before asking for approval.
    - Confirm that all icon-like layers and vector marks passed the Icon And Vector Asset Review with provenance tied to actual Figma instance node ids.
    - Confirm that complex regions passed the Instance Context And Layer Tree Review, including overlays, masks, opacity layers, and stacking order.
    - Confirm that text-bearing and auto-layout regions passed the Bounds And Text Layout Review, including fixed text frames, padding, gaps, overflow, and child bounds.
-   - Ask the user to confirm whether the visual restoration is accurate enough.
+   - Read `prompts/visual-review.md` and use the matching language prompt to ask whether the visual restoration is accurate enough.
    - If the user gives visual corrections, patch the HTML/CSS/assets and preview again.
    - Do not ask animation-start or linked-module questions, infer animation flow, or start animation work until the user confirms the visual restoration.
-   - After explicit visual approval, offer Frontend Mode as an optional branch: continue animation/MP4, export a frontend starter project, or do both.
+   - After explicit visual approval, read `prompts/branch-selection.md` and offer Frontend Mode as an optional branch: continue animation/MP4, export a frontend starter project, or do both.
    - Stop and wait for explicit user confirmation before continuing to animation or generating frontend code.
 
 2. **Animation Review**
    - After the user confirms the visual stage, implement the template-driven animation timeline and selected effect packs.
    - Preview the animated HTML for the user.
-   - Ask the user to confirm whether timing, linkage, cursor behavior, text effects, and rhythm are acceptable.
+   - Read `prompts/animation-review.md` and use the matching language prompt to ask whether timing, linkage, cursor behavior, text effects, and rhythm are acceptable.
    - If the user gives animation corrections, patch the timeline and preview again.
    - Do not export the MP4 until the user confirms the animation.
 
 3. **MP4 Export Checkpoint**
    - After animation approval and before MP4 export, check whether this conversation introduced reusable special requirements that could improve the current template or become a new template.
-   - If reusable requirements exist, ask whether the user wants to update the current template, create a new template, or keep the requirements only for this demo. If they choose to persist changes, read `references/maintenance.md`.
+   - If reusable requirements exist, read `prompts/template-persistence.md` and ask whether the user wants to update the current template, create a new template, or keep the requirements only for this demo. If they choose to persist changes, read `references/maintenance.md`.
    - Only after this persistence check is resolved, capture and encode the final MP4.
    - Verify video metadata and report the output path.
    - After successful MP4 export, offer Frontend Mode again if it has not already been generated for this demo.
@@ -230,6 +239,7 @@ This workflow has three required user-confirmation checkpoints. Do not skip them
 
 3. **Preview and confirm visual fidelity**
    - Show the static HTML preview before adding animation.
+   - Run `node scripts/review_static.js --demo output/<demo-slug>` before asking for visual approval.
    - Confirm the preview viewport fits the full fixed stage without cropping, browser-level horizontal scroll, or raw 1920px overflow.
    - Confirm that every visible icon-like layer matches the Figma source asset; icon mismatches are fidelity failures, not acceptable approximations.
    - For directional or transformed icons, verify orientation, stroke/weight, visual inset, and rendered bounds against Figma; do not accept icons that only have the right general shape.
@@ -238,7 +248,7 @@ This workflow has three required user-confirmation checkpoints. Do not skip them
    - After changes to any shared selector, shared asset, or reused component, inspect focused crops for every affected instance before re-requesting approval.
    - Invite visual diff comments only during the Visual Fidelity Review: text typos, icon mismatches, wrapping, alignment, colors, spacing, radius, shadows, missing assets, or layout scale.
    - Address visual comments precisely and preview again.
-   - After visual approval, offer the next branch: continue animation/MP4, export a Frontend Mode project, or do both.
+   - After visual approval, read `prompts/branch-selection.md` and offer the next branch: continue animation/MP4, export a Frontend Mode project, or do both.
    - If the user selects Frontend Mode, read `references/frontend-mode.md` and generate the standalone frontend project from the approved HTML and provenance artifacts.
    - Stop and wait for explicit user confirmation before continuing to animation or frontend export.
 

@@ -67,27 +67,7 @@ Non-reusable requirements include:
 - corrections that only repair this Figma file
 - user choices explicitly described as temporary
 
-If reusable requirements exist, ask the user before export in the user's current language.
-
-English prompt:
-
-```text
-Some reusable requirements came up during animation review. Do you want to save them to the template library before exporting the MP4?
-
-1. Update the current template: future demos of this type should follow these rules.
-2. Create a new template: this run has become a distinct demo type.
-3. Use only for this demo: do not modify the template library; export the MP4 now.
-```
-
-Chinese prompt:
-
-```text
-这次动画确认过程中有一些可复用要求。要不要在导出 MP4 前把它沉淀到模板库？
-
-1. 更新当前模板：适合同一类 demo 以后都遵循这些规则。
-2. 新增一个模板：适合这次已经形成了一个新的 demo 类型。
-3. 只用于本次 demo：不修改模板库，直接导出 MP4。
-```
+If reusable requirements exist, read `prompts/template-persistence.md` and ask the user before export in the user's current language.
 
 If the user chooses to update the current template, modify the selected template and `catalog.json` only where needed. If they choose to create a new template, follow the "Adding A Template" flow. If they choose one-off, do not write library changes; continue to export.
 

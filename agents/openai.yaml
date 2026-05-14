@@ -1,6 +1,6 @@
 interface:
   display_name: "Figma2Demo"
-  short_description: "Figma MCP-backed animated HTML/MP4 demo export, with guided template and effect-pack maintenance."
-  default_prompt: "Use $figma2demo to either create a reviewed animated HTML/MP4 demo from Figma after checking Figma MCP access, or guide me through adding/modifying templates, effect packs, and parameters."
+  short_description: "Figma MCP-backed reviewed HTML/MP4 demo export, with static review gates and guided template maintenance."
+  default_prompt: "Use $figma2demo to either create a reviewed animated HTML/MP4 demo from Figma after checking Figma MCP access, run the static review gate before visual approval, or guide me through adding/modifying templates, effect packs, and parameters."
 policy:
   allow_implicit_invocation: true

@@ -30,7 +30,7 @@ For agents that support slash commands:
 
 ### Agent Adapters
 
-Adapters are setup notes for different agent environments. They are not runtime files; the installed skill only needs `SKILL.md`, `catalog.json`, `templates/`, `effects/`, `parameters/`, `references/`, `scripts/`, and `assets/`.
+Adapters are setup notes for different agent environments. They are not runtime files; the installed skill only needs `SKILL.md`, `catalog.json`, `templates/`, `effects/`, `parameters/`, `references/`, `prompts/`, `scripts/`, and `assets/`.
 
 | Agent | Adapter | Trigger |
 | --- | --- | --- |
@@ -90,6 +90,12 @@ Figma2Demo treats Figma as the source of truth. The HTML is built from Figma met
 
 It also records provenance for icons, complex layers, and text/layout regions before review. That makes the HTML easier to inspect, fix, and reuse as a trusted intermediate artifact for both MP4 export and frontend work.
 
+Run the one-command static review gate before asking for visual approval:
+
+```bash
+node scripts/review_static.js --demo output/<demo-slug>
+```
+
 ### Repository Layout
 
 ```text
@@ -100,10 +106,12 @@ templates/                Reusable demo schemes and template scaffold
 effects/                  Animation effect packs and effect scaffold
 parameters/               Rules for further customizing animation details, rhythm, and logic
 references/               Maintenance, frontend mode, and MP4 export details
+prompts/                  Standard checkpoint prompts for user confirmations
 scripts/                  Visual fidelity checks, frame capture, and encoding scripts
 assets/                   Shared runtime assets, such as the default cursor
 adapters/                 Agent-specific onboarding notes, not runtime files
 agents/openai.yaml        Codex UI metadata
+CHANGELOG.md              Version history
 ```
 
 ### Library Maintenance
@@ -115,7 +123,7 @@ Reusable behavior lives in:
 - `parameters/`: template-only logic, timing, or export rules
 - `catalog.json`: all metadata, file paths, tags, touched areas, and conflicts
 
-Use `references/maintenance.md` for guided updates, `references/frontend-mode.md` for frontend starter export, and `references/export.md` for capture/encoding details. See `catalog.json` for the current built-ins.
+Use `references/maintenance.md` for guided updates, `references/frontend-mode.md` for frontend starter export, `references/export.md` for capture/encoding details, and `references/compatibility.md` for version and compatibility notes. See `catalog.json` for the current built-ins.
 
 ---
 
@@ -147,7 +155,7 @@ Read https://github.com/TengShao/figma2demo and install Figma2Demo for this agen
 
 ### Agent 适配
 
-`adapters/` 只是不同 agent 的接入说明，不是运行时文件。真正安装 skill 时，只需要 `SKILL.md`、`catalog.json`、`templates/`、`effects/`、`parameters/`、`references/`、`scripts/` 和 `assets/`。
+`adapters/` 只是不同 agent 的接入说明，不是运行时文件。真正安装 skill 时，只需要 `SKILL.md`、`catalog.json`、`templates/`、`effects/`、`parameters/`、`references/`、`prompts/`、`scripts/` 和 `assets/`。
 
 | Agent | 适配文件 | 触发方式 |
 | --- | --- | --- |
@@ -207,6 +215,12 @@ Figma2Demo 的核心是先把视觉还原做扎实。HTML 会基于 Figma 元数
 
 它还会在审阅前记录图标、复杂图层、文字和布局区域的 provenance 信息。这样生成的 HTML 更容易检查和修正，也更适合作为导出 MP4 或继续做前端开发的可信中间产物。
 
+视觉确认前，先运行一键静态审阅门禁：
+
+```bash
+node scripts/review_static.js --demo output/<demo-slug>
+```
+
 ### 目录结构
 
 ```text
@@ -217,10 +231,12 @@ templates/                可复用演示模板和模板脚手架
 effects/                  动画特效包和特效脚手架
 parameters/               可进一步自定义动画细节、节奏和逻辑规则
 references/               维护、前端模式和 MP4 导出细节
+prompts/                  用户确认节点的标准话术
 scripts/                  视觉还原检查、帧捕获和编码脚本
 assets/                   默认鼠标等共享运行时素材
 adapters/                 不同 Agent 的接入说明，不是运行时文件
 agents/openai.yaml        Codex 界面元数据
+CHANGELOG.md              版本历史
 ```
 
 ### 维护模板库
@@ -232,4 +248,4 @@ agents/openai.yaml        Codex 界面元数据
 - `parameters/`：模板内部使用的逻辑、节奏或导出规则
 - `catalog.json`：所有元数据、文件路径、标签、影响区域和冲突关系
 
-维护流程见 `references/maintenance.md`，前端项目导出见 `references/frontend-mode.md`，MP4 导出细节见 `references/export.md`。当前内置项见 `catalog.json`。
+维护流程见 `references/maintenance.md`，前端项目导出见 `references/frontend-mode.md`，MP4 导出细节见 `references/export.md`，版本和兼容性说明见 `references/compatibility.md`。当前内置项见 `catalog.json`。
